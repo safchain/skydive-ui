@@ -27,7 +27,6 @@ class SKComponent {
 
   // svg
   protected svgG: any;
-  private svgRect: any;
 
   constructor(name: string, clazz: string) {
     this.name = name;
@@ -35,26 +34,23 @@ class SKComponent {
 
     var gDom =  document.createElementNS("http://www.w3.org/2000/svg", "g");
     this.svgG = d3.select(gDom).attr("class", this.clazz);
-
-    // create the bouding box
-    this.svgRect = this.svgG.append("rect");
   }
 
-  render() {
+  render(): void {
     return this.svgG.node();
   }
 
-  addUpdatedListenner(listener: (SKEvent) => void) {
+  addUpdatedListenner(listener: (SKEvent) => void): void {
     this.onUpdatedListeners.push(listener);
   }
 
-  notifyUpdated(event: SKEvent) {
+  notifyUpdated(event: SKEvent): void {
     for (let listener of this.onUpdatedListeners) {
       listener(event);
     }
   }
 
-  setPos(x: number, y: number, event?: SKEvent) {
+  setPos(x: number, y: number, event?: SKEvent): void {
     this.x = x;
     this.y = y;
     this.svgG.attr("transform", (d) => { return "translate(" + this.x + "," + this.y + ")"; })
@@ -66,10 +62,9 @@ class SKComponent {
     this.notifyUpdated(event);
   }
 
-  setSize(width, height, event?: SKEvent) {
+  setSize(width: number, height: number, event?: SKEvent): void {
     this.width = width;
     this.height = height;
-    this.svgRect.attr("width", this.width).attr("height", this.height);
 
     if (!event) {
       event = new SKEvent(this);
@@ -77,21 +72,33 @@ class SKComponent {
 
     this.notifyUpdated(event);
   }
-
-  // called when the view is invalidate, meaning needs to redraw
-  invalidate(event?: SKEvent) {
-  }
 }
 
 class SKInterface extends SKComponent {
 
-  constructor(name: string, clazz: string) {
+  protected img: string;
+
+  // svg obj
+  private svgRect: any;
+
+  constructor(name: string, clazz: string = "sk-interface") {
     super(name, clazz);
 
     this.name = name;
     this.clazz = clazz;
 
-    this.setSize(20, 20);
+    // create the bouding box
+    this.svgRect = this.svgG
+      .append("rect")
+      .attr('rx', 5)
+      .attr('ry', 5);
+    this.svgRect.attr("width", 32).attr("height", 32);
+
+    this.svgG.append("text")
+      .attr("y", 52)
+      .text(this.name);
+
+    this.setSize(32, 56);
   }
 }
 
@@ -106,7 +113,7 @@ class SKLink {
   // relation
   container: SKContainer;
 
-  private lineGenerator: any = d3.line().curve(d3.curveCardinal);
+  private lineGenerator: any = d3.line().curve(d3.curveBasis);
 
   // svg
   protected svgG: any;
@@ -131,6 +138,42 @@ class SKLink {
     this.invalidate()
   }
 
+  endpoint(component: SKComponent, x1: number, y1: number, side: string): Array<number> {
+    if (side === "top") {
+      return [x1, y1 - component.height / 2];
+    }
+    if (side === "bottom") {
+      return [x1, y1 + component.height / 2];
+    }
+    if (side === "left") {
+      return  [x1 - component.width / 2, y1];
+    }
+    if (side === "right") {
+      return [x1 + component.width / 2, y1];
+    }
+  }
+
+  anchorSide(component: SKComponent, x1: number, y1: number, x2: number, y2: number): string {
+    var w = component.width, h = component.height;
+    var slope = (y1 - y2) / (x1 - x2);
+    var hsw = slope * w / 2;
+    var hsh = (h / 2) / slope;
+    var hh = h / 2;
+    var hw = w / 2;
+
+    if (-hh <= hsw && hsw <= hh) {
+      if (x1 < x2) {
+        return "right";
+      }
+      return "left";
+    }
+
+    if (y1 > y2) {
+      return "top";
+    }
+    return "bottom";
+  }
+
   localPos(component: SKComponent): Array<number> {
     var x = component.x, y = component.y, container = component.container;
 
@@ -144,22 +187,66 @@ class SKLink {
     return [x, y];
   }
 
-  invalidate(event?: SKEvent) {
-    var points = [
-      this.localPos(this.component1),
-      this.localPos(this.component2)
-    ];
+  controlPoint(x, y, dx, dy, side: string): Array<number> {
+    if (side === "top") {
+      return [x, y - dy];
+    }
+    if (side === "bottom") {
+      return [x, y + dy];
+    }
+    if (side === "left") {
+      return  [x - dx, y];
+    }
+    if (side === "right") {
+      return [x + dx, y];
+    }
+  }
+
+  interpolate(x1: number, y1: number, s1: string, x2: number, y2: number, s2: string): Array<Array<number>> {
+    var points = [[x1, y1]];
+
+    // 4 for now but could be a parameter of link.
+    var dx = Math.floor((x2 - x1) / 4);
+    var dy = Math.floor((y2 - y1) / 4);
+
+    var c1 = this.controlPoint(x1, y1, dx, dy, s1);
+    points.push(c1);
+
+    var c2 = this.controlPoint(x2, y2, dx, dy, s2);
+    points.push(c2);
+
+    points.push([x2, y2]);
+
+    return points;
+  }
+
+  invalidate(event?: SKEvent): void {
+    var c1 = this.component1, c2 = this.component2;
+    var p1 = this.localPos(c1);
+    var p2 = this.localPos(c2);
+
+    var s1 = this.anchorSide(c1,
+      p1[0] + c1.width / 2, p1[1] + c1.height / 2,
+      p2[0] + c2.width / 2, p2[1] + c2.height / 2);
+    var s2 = this.anchorSide(c2,
+      p2[0] + c2.width / 2, p2[1] + c2.height / 2,
+      p1[0] + c1.width / 2, p1[1] + c1.height / 2);
+
+    var e1 = this.endpoint(c1, p1[0] + c1.width / 2, p1[1] + c1.height / 2, s1);
+    var e2 = this.endpoint(c2, p2[0] + c2.width / 2, p2[1] + c2.height / 2, s2);
+
+    var points = this.interpolate(e1[0], e1[1], s1, e2[0], e2[1], s2);
 
     var pathData = this.lineGenerator(points);
     this.svgPath.attr('d', pathData);
   }
 
-  render() {
+  render(): void {
     return this.svgG.node();
   }
 }
 
-class SKContainer extends SKComponent {
+abstract class SKContainer extends SKComponent {
 
   protected components: Array<SKComponent> = new Array();
   protected links: Array<SKLink> = new Array();
@@ -169,12 +256,18 @@ class SKContainer extends SKComponent {
   protected linkD3Data: any;
 
   // svg
+  private svgRect: any;
   protected svgComponent: any;
   private svgLink: any;
 
   constructor(name: string, clazz: string) {
     super(name, clazz);
 
+    // create the bouding box
+    this.svgRect = this.svgG
+      .append("rect")
+      .attr('rx', 5)
+      .attr('ry', 5);
     this.svgComponent = this.svgG.append("g");
     this.svgLink = this.svgG.append("g");
 
@@ -182,7 +275,7 @@ class SKContainer extends SKComponent {
     this.linkD3Data = this.svgLink.selectAll(".link");
   }
 
-  addComponent(component: SKComponent) {
+  addComponent(component: SKComponent): void {
     this.components.push(component);
     component.container = this;
 
@@ -198,7 +291,7 @@ class SKContainer extends SKComponent {
     this.invalidate();
   }
 
-  addLink(link: SKLink) {
+  addLink(link: SKLink): void {
     this.links.push(link);
     link.container = this;
 
@@ -211,6 +304,13 @@ class SKContainer extends SKComponent {
     // need to be implemented by a real container
     this.invalidate();
   }
+
+  setSize(width: number, height: number, event?: SKEvent): void {
+    super.setSize(width, height);
+    this.svgRect.attr("width", this.width).attr("height", this.height);
+  }
+
+  abstract invalidate(event?: SKEvent): void;
 }
 
 enum SKFlowLayoutOrientation {
@@ -232,7 +332,7 @@ class SKFlowLayout extends SKContainer {
     this.margin = margin || 0;
   }
 
-  invalidate(event: SKEvent) {
+  invalidate(event: SKEvent): void {
     var x = this.margin, y = this.margin, width = 0, height = 0;
 
     // do not react on event that originate from myself
@@ -267,6 +367,32 @@ class SKFlowLayout extends SKContainer {
 
     for (let link of this.links) {
       link.invalidate();
+    }
+  }
+}
+
+class SKNetworkNamespaceLayout extends SKFlowLayout {
+
+  protected layer1: SKFlowLayout = new SKFlowLayout("layer1", "sk-intf-layer1", SKFlowLayoutOrientation.Horizontal, 20, 20);
+  protected layer2: SKFlowLayout = new SKFlowLayout("layer2", "sk-intf-layer2", SKFlowLayoutOrientation.Horizontal, 20, 20);
+  protected layer3: SKFlowLayout = new SKFlowLayout("layer3", "sk-intf-layer3", SKFlowLayoutOrientation.Horizontal, 20, 20);
+  protected layer4: SKFlowLayout = new SKFlowLayout("layer4", "sk-intf-layer4", SKFlowLayoutOrientation.Vertical, 20, 20);
+
+  constructor(name: string, clazz: string) {
+    super(name, clazz, SKFlowLayoutOrientation.Vertical, 20, 20);
+
+    super.addComponent(this.layer1);
+    super.addComponent(this.layer2);
+    super.addComponent(this.layer3);
+    super.addComponent(this.layer4);
+  }
+
+  addComponent(component: SKComponent): void {
+    if (component instanceof SKInterface) {
+      this.layer1.addComponent(component);
+    }
+    if (component instanceof SKNetworkNamespaceLayout) {
+      this.layer4.addComponent(component);
     }
   }
 }

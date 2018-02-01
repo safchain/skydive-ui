@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
+
+.layout {
+  fill: #eee;
+}
+
 .layout1 {
-  fill: red;
+  fill: #BDBDBD;
 }
 
 .layout2 {
@@ -18,6 +23,12 @@ path {
 	stroke: #999;
 }
 
+.sk-interface {
+  fill: #009688;
+  stroke: #00695f;
+  stroke-width: 1;
+}
+
 </style>
 <body>
 
@@ -31,17 +42,17 @@ var svg = d3.select("body").append("svg")
     .attr("height", 600)
   .append("g");
 
-var main = new SKFlowLayout("Main", "layout", SKFlowLayoutOrientation.Vertical, 10, 10);
+var main = new SKFlowLayout("Main", "layout", SKFlowLayoutOrientation.Vertical, 50, 50);
 
-var layout1 = new SKFlowLayout("SKInterfacesA", "layout1", SKFlowLayoutOrientation.Horizontal, 10, 10);
-var intf1 = new SKInterface("eth0", "item");
-var intf2 = new SKInterface("eth1", "item");
+var layout1 = new SKFlowLayout("SKInterfacesA", "layout1", SKFlowLayoutOrientation.Horizontal, 50, 50);
+var intf1 = new SKInterface("eth0");
+var intf2 = new SKInterface("eth1");
 layout1.addComponent(intf1);
 layout1.addComponent(intf2);
 
-var layout2 = new SKFlowLayout("SKInterfacesB", "layout2", SKFlowLayoutOrientation.Horizontal, 10, 10);
-var intf3 = new SKInterface("eth0", "item");
-var intf4 = new SKInterface("eth1", "item");
+var layout2 = new SKFlowLayout("SKInterfacesB", "layout2", SKFlowLayoutOrientation.Horizontal, 50, 50);
+var intf3 = new SKInterface("eth0");
+var intf4 = new SKInterface("eth1");
 layout2.addComponent(intf3);
 layout2.addComponent(intf4);
 
