@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.layout1 {
+  fill: red;
+}
+
+.layout2 {
+  fill: blue;
+}
+
+.item {
+  fill: green;
+}
+
+path {
+	fill: none;
+	stroke: #999;
+}
+
+</style>
+<body>
+
+<!-- load the d3.js library -->
+<script src="//d3js.org/d3.v4.min.js"></script>
+<script src="layout.js"></script>
+<script>
+
+var svg = d3.select("body").append("svg")
+    .attr("width", 600)
+    .attr("height", 600)
+  .append("g");
+
+var main = new SKFlowLayout("Main", "layout", SKFlowLayoutOrientation.Vertical, 10, 10);
+
+var layout1 = new SKFlowLayout("SKInterfacesA", "layout1", SKFlowLayoutOrientation.Horizontal, 10, 10);
+var intf1 = new SKInterface("eth0", "item");
+var intf2 = new SKInterface("eth1", "item");
+layout1.addComponent(intf1);
+layout1.addComponent(intf2);
+
+var layout2 = new SKFlowLayout("SKInterfacesB", "layout2", SKFlowLayoutOrientation.Horizontal, 10, 10);
+var intf3 = new SKInterface("eth0", "item");
+var intf4 = new SKInterface("eth1", "item");
+layout2.addComponent(intf3);
+layout2.addComponent(intf4);
+
+var link1 = new SKLink("SKLink1", "link1", intf1, intf4);
+main.addLink(link1);
+
+var components = [main];
+
+
+main.addComponent(layout1);
+main.addComponent(layout2);
+
+// append the rectangles for the bar chart
+svg.selectAll(".bar")
+    .data(components)
+  .enter()
+    .append(function(d) {
+      return d.render();
+    });
+
+</script>
+</body>
