@@ -24,11 +24,20 @@ export class title extends SKComponent {
 
     this.svgText = this.svgG
       .append("text")
+      .attr('text-anchor', 'middle')
+      .attr('visibility', 'hidden')
       .text(this.name);
+
+    // fake height because of padding
+    this.height = 8;
   }
 
   containerUpdated(): void {
-    console.log("updated");
+    this.width = this.container.width;
+
+    this.svgText
+      .attr('visibility', 'visible')
+      .attr('x', this.container.width / 2);
   }
 }
 
@@ -47,7 +56,7 @@ export class SKNetworkNamespaceLayout extends SKFlowLayout {
     "layer4", "sk-netns-intf-layer4", SKFlowLayoutOrientation.Vertical, this.layerMargin, this.layerPadding);
 
   constructor(name: string, clazz: string) {
-    super(name, clazz, SKFlowLayoutOrientation.Vertical, {top: 25}, {});
+    super(name, clazz, SKFlowLayoutOrientation.Vertical, {top: 20}, {});
 
     super.addComponent(new title(this.name));
     super.addComponent(this.layer1);

@@ -254,8 +254,8 @@ var SKContainer = /** @class */ (function (_super) {
         _this.componentD3Data = _this.svgComponent.selectAll(".component");
         _this.linkD3Data = _this.svgLink.selectAll(".link");
         // debounced functions
-        _this.notifyComponents = debounce(_this._notifyComponents.bind(_this), 200);
-        _this.invalidateLinks = debounce(_this._invalidateLinks.bind(_this), 200);
+        _this.notifyComponents = debounce(_this._notifyComponents.bind(_this), 100);
+        _this.invalidateLinks = debounce(_this._invalidateLinks.bind(_this), 100);
         return _this;
     }
     SKContainer.prototype.addComponent = function (component) {
@@ -424,25 +424,11 @@ var layout_ts_1 = __webpack_require__(1);
 var interface_ts_1 = __webpack_require__(3);
 var netns_ts_1 = __webpack_require__(7);
 var svg = d3.select("body").append("svg")
-    .attr("width", 600)
-    .attr("height", 600)
+    .attr("width", 8000)
+    .attr("height", 1200)
     .append("g");
 var topology = new layout_ts_1.SKFlowLayout("Topology", "topology", layout_ts_1.SKFlowLayoutOrientation.Horizontal, {}, { x: 20, y: 20 });
-var host1 = new netns_ts_1.SKNetworkNamespaceLayout("Host1", "host");
-var intf1 = new interface_ts_1.SKInterface("eth0");
-var intf2 = new interface_ts_1.SKInterface("eth1");
-host1.addComponent(intf1);
-host1.addComponent(intf2);
-var host2 = new netns_ts_1.SKNetworkNamespaceLayout("Host1", "host");
-var intf3 = new interface_ts_1.SKInterface("eth0");
-var intf4 = new interface_ts_1.SKInterface("eth1");
-host2.addComponent(intf3);
-host2.addComponent(intf4);
-//var link1 = new SKLink("SKLink1", "link1", intf1, intf4);
-//main.addLink(link1);
 var components = [topology];
-topology.addComponent(host1);
-topology.addComponent(host2);
 // append the rectangles for the bar chart
 svg.selectAll(".bar")
     .data(components)
@@ -450,6 +436,16 @@ svg.selectAll(".bar")
     .append(function (d) {
     return d.render();
 });
+for (var i = 0; i != 100; i++) {
+    var host1 = new netns_ts_1.SKNetworkNamespaceLayout("Host" + i, "host");
+    var intf1 = new interface_ts_1.SKInterface("eth0");
+    var intf2 = new interface_ts_1.SKInterface("eth1");
+    host1.addComponent(intf1);
+    host1.addComponent(intf2);
+    topology.addComponent(host1);
+}
+//var link1 = new SKLink("SKLink1", "link1", intf1, intf4);
+//main.addLink(link1);
 console.log("Started !!!!");
 
 
@@ -560,11 +556,18 @@ var title = /** @class */ (function (_super) {
         _this.clazz = clazz;
         _this.svgText = _this.svgG
             .append("text")
+            .attr('text-anchor', 'middle')
+            .attr('visibility', 'hidden')
             .text(_this.name);
+        // fake height because of padding
+        _this.height = 8;
         return _this;
     }
     title.prototype.containerUpdated = function () {
-        console.log("updated");
+        this.width = this.container.width;
+        this.svgText
+            .attr('visibility', 'visible')
+            .attr('x', this.container.width / 2);
     };
     return title;
 }(component_ts_1.SKComponent));
@@ -572,7 +575,7 @@ exports.title = title;
 var SKNetworkNamespaceLayout = /** @class */ (function (_super) {
     __extends(SKNetworkNamespaceLayout, _super);
     function SKNetworkNamespaceLayout(name, clazz) {
-        var _this = _super.call(this, name, clazz, layout_ts_1.SKFlowLayoutOrientation.Vertical, { top: 25 }, {}) || this;
+        var _this = _super.call(this, name, clazz, layout_ts_1.SKFlowLayoutOrientation.Vertical, { top: 20 }, {}) || this;
         _this.layerMargin = { left: 20, right: 20, top: 20, bottom: 20 };
         _this.layerPadding = { x: 20, y: 20 };
         _this.layer1 = new layout_ts_1.SKFlowLayout("layer1", "sk-netns-intf-layer1", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);

@@ -178,8 +178,8 @@ export abstract class SKContainer extends SKComponent {
     this.linkD3Data = this.svgLink.selectAll(".link");
 
     // debounced functions
-    this.notifyComponents = debounce(this._notifyComponents.bind(this), 200);
-    this.invalidateLinks = debounce(this._invalidateLinks.bind(this), 200);
+    this.notifyComponents = debounce(this._notifyComponents.bind(this), 100);
+    this.invalidateLinks = debounce(this._invalidateLinks.bind(this), 100);
   }
 
   addComponent(component: SKComponent): void {
