@@ -2,20 +2,28 @@
 <meta charset="utf-8">
 <style>
 
-.layout {
+body {
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#cbccc8)) fixed;
+  background: -moz-linear-gradient(top, #fff, #cbccc8);
+  background-repeat: no-repeat;
+}
+
+.topology {
+  fill: none;
+}
+
+.host {
+  fill: #088686;
+}
+
+.host .sk-netns-title {
   fill: #eee;
+  stroke: none;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
-.layout1 {
-  fill: #BDBDBD;
-}
-
-.layout2 {
-  fill: blue;
-}
-
-.item {
-  fill: green;
+.host .sk-netns-intf-layer1 {
+  fill: #e8e8e8;
 }
 
 path {
@@ -23,55 +31,18 @@ path {
 	stroke: #999;
 }
 
-.sk-interface {
-  fill: #009688;
-  stroke: #00695f;
-  stroke-width: 1;
+.sk-interface text {
+  fill: #444;
+  stroke: none;
+  font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
 }
 
 </style>
-<body>
-
-<!-- load the d3.js library -->
 <script src="//d3js.org/d3.v4.min.js"></script>
-<script src="layout.js"></script>
+
+<body>
+<script src="./dist/bundle.js"></script>
 <script>
-
-var svg = d3.select("body").append("svg")
-    .attr("width", 600)
-    .attr("height", 600)
-  .append("g");
-
-var main = new SKFlowLayout("Main", "layout", SKFlowLayoutOrientation.Vertical, 50, 50);
-
-var layout1 = new SKFlowLayout("SKInterfacesA", "layout1", SKFlowLayoutOrientation.Horizontal, 50, 50);
-var intf1 = new SKInterface("eth0");
-var intf2 = new SKInterface("eth1");
-layout1.addComponent(intf1);
-layout1.addComponent(intf2);
-
-var layout2 = new SKFlowLayout("SKInterfacesB", "layout2", SKFlowLayoutOrientation.Horizontal, 50, 50);
-var intf3 = new SKInterface("eth0");
-var intf4 = new SKInterface("eth1");
-layout2.addComponent(intf3);
-layout2.addComponent(intf4);
-
-var link1 = new SKLink("SKLink1", "link1", intf1, intf4);
-main.addLink(link1);
-
-var components = [main];
-
-
-main.addComponent(layout1);
-main.addComponent(layout2);
-
-// append the rectangles for the bar chart
-svg.selectAll(".bar")
-    .data(components)
-  .enter()
-    .append(function(d) {
-      return d.render();
-    });
 
 </script>
 </body>

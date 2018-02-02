@@ -1,6 +1,8 @@
 import { SKEvent } from "./event.ts";
 import { SKComponent } from "./component.ts";
 
+import debounce = require("debounce");
+
 declare var d3: any;
 
 export class SKLink {
@@ -161,19 +163,23 @@ export abstract class SKContainer extends SKComponent {
   protected svgComponent: any;
   private svgLink: any;
 
+  notifyComponents: () => void;
+  invalidateLinks: () => void;
+
   constructor(name: string, clazz: string) {
     super(name, clazz);
 
     // create the bouding box
-    this.svgRect = this.svgG
-      .append("rect")
-      .attr('rx', 5)
-      .attr('ry', 5);
+    this.svgRect = this.svgG.append("rect")
     this.svgComponent = this.svgG.append("g");
     this.svgLink = this.svgG.append("g");
 
     this.componentD3Data = this.svgComponent.selectAll(".component");
     this.linkD3Data = this.svgLink.selectAll(".link");
+
+    // debounced functions
+    this.notifyComponents = debounce(this._notifyComponents.bind(this), 200);
+    this.invalidateLinks = debounce(this._invalidateLinks.bind(this), 200);
   }
 
   addComponent(component: SKComponent): void {
@@ -206,9 +212,25 @@ export abstract class SKContainer extends SKComponent {
     this.invalidate();
   }
 
+  // debounced
+  _notifyComponents(): void {
+    for (let component of this.components) {
+      component.containerUpdated();
+    }
+  }
+
+  // debounced
+  _invalidateLinks(): void {
+    for (let link of this.links) {
+      link.invalidate();
+    }
+  }
+
   setSize(width: number, height: number, event?: SKEvent): void {
     super.setSize(width, height);
     this.svgRect.attr("width", this.width).attr("height", this.height);
+
+    this.notifyComponents();
   }
 
   abstract invalidate(event?: SKEvent): void;
@@ -219,22 +241,37 @@ export enum SKFlowLayoutOrientation {
   Vertical = 1,
 }
 
+// margin / padding definition
+export type SKMargin = {
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SKPadding = {
+  x?: number;
+  y?: number;
+};
+
 export class SKFlowLayout extends SKContainer {
 
   orientation: SKFlowLayoutOrientation
-  padding: number;
-  margin: number;
+  margin: SKMargin;
+  padding: SKPadding;
 
-  constructor(name: string, clazz: string, orientation: SKFlowLayoutOrientation, padding: number, margin: number) {
+  constructor(name: string, clazz: string, orientation: SKFlowLayoutOrientation, margin: SKMargin, padding: SKPadding) {
     super(name, clazz);
 
     this.orientation = orientation;
-    this.padding = padding || 0;
-    this.margin = margin || 0;
+    this.padding = padding;
+    this.margin = margin;
   }
-
   invalidate(event: SKEvent): void {
-    var x = this.margin, y = this.margin, width = 0, height = 0;
+    var ml = this.margin.left || 0, mr = this.margin.right || 0;
+    var mt = this.margin.top || 0, mb = this.margin.bottom || 0;
+
+    var x = ml, y = mt || 0, width = 0, height = 0;
 
     // do not react on event that originate from myself
     if (event && event.source === this) {
@@ -243,31 +280,32 @@ export class SKFlowLayout extends SKContainer {
 
     var event = new SKEvent(this);
 
+    var px = this.padding.x || 0, py = this.padding.x || 0;
+
     this.componentD3Data.each((d, i) => {
       d.setPos(x, y, event);
       if (this.orientation === SKFlowLayoutOrientation.Horizontal) {
-        x += d.width + this.padding;
+        x += d.width + px;
 
         if (height < d.height) height = d.height;
-        width += d.width + this.padding;
+        width += d.width + px;
       } else {
-        y += d.height + this.padding;
+        y += d.height + py;
 
         if (width < d.width) width = d.width;
-        height += d.height + this.padding;
+        height += d.height + py;
       }
     });
 
     if (this.orientation === SKFlowLayoutOrientation.Horizontal) {
-      width -= this.padding;
+      width -= px;
     } else {
-      height -= this.padding;
+      height -= py;
     }
 
-    this.setSize(width + this.margin * 2, height + this.margin * 2, event);
+    this.setSize(width + ml + mr, height + mt + mb, event);
 
-    for (let link of this.links) {
-      link.invalidate();
-    }
+    // debounced
+    this.invalidateLinks();
   }
 }

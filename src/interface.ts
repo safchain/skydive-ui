@@ -9,7 +9,6 @@ export class SKInterface extends SKComponent {
   protected img: string;
 
   // svg obj
-  private svgRect: any;
   private svgImg: any;
 
   constructor(name: string, clazz: string = "sk-interface") {
@@ -18,15 +17,10 @@ export class SKInterface extends SKComponent {
     this.name = name;
     this.clazz = clazz;
 
-    // create the bouding box
-    this.svgRect = this.svgG
-      .append("rect")
-      .attr("width", 32).attr("height", 32);
-
     this.svgImg = this.svgG.append("image")
       .attr("xlink:href", intfImg)
-      .attr("width", "24px")
-      .attr("height", "24px");
+      .attr("width", "32px")
+      .attr("height", "32px");
 
     this.svgG.append("text")
       .attr("y", 52)

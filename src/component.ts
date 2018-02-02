@@ -38,11 +38,14 @@ export class SKComponent {
     this.onUpdatedListeners.push(listener);
   }
 
-  notifyUpdated(event: SKEvent): void {
+  protected notifyUpdated(event: SKEvent): void {
     for (let listener of this.onUpdatedListeners) {
       listener(event);
     }
   }
+
+  // called by container when updated
+  containerUpdated(): void {}
 
   setPos(x: number, y: number, event?: SKEvent): void {
     this.x = x;
