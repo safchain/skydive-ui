@@ -69,6 +69,27 @@
 
 "use strict";
 
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
 exports.__esModule = true;
 var event_ts_1 = __webpack_require__(2);
 var SKComponent = /** @class */ (function () {
@@ -127,6 +148,27 @@ exports.SKComponent = SKComponent;
 
 "use strict";
 
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -362,6 +404,27 @@ exports.SKFlowLayout = SKFlowLayout;
 
 "use strict";
 
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
 exports.__esModule = true;
 var SKEvent = /** @class */ (function () {
     function SKEvent(source) {
@@ -378,6 +441,27 @@ exports.SKEvent = SKEvent;
 
 "use strict";
 
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -420,22 +504,10 @@ exports.SKInterface = SKInterface;
 "use strict";
 
 exports.__esModule = true;
-var layout_ts_1 = __webpack_require__(1);
 var interface_ts_1 = __webpack_require__(3);
 var netns_ts_1 = __webpack_require__(7);
-var svg = d3.select("body").append("svg")
-    .attr("width", 8000)
-    .attr("height", 1200)
-    .append("g");
-var topology = new layout_ts_1.SKFlowLayout("Topology", "topology", layout_ts_1.SKFlowLayoutOrientation.Horizontal, {}, { x: 20, y: 20 });
-var components = [topology];
-// append the rectangles for the bar chart
-svg.selectAll(".bar")
-    .data(components)
-    .enter()
-    .append(function (d) {
-    return d.render();
-});
+var topology_ts_1 = __webpack_require__(8);
+var topology = new topology_ts_1.SKTopology("body", 1800, 800);
 for (var i = 0; i != 100; i++) {
     var host1 = new netns_ts_1.SKNetworkNamespaceLayout("Host" + i, "host");
     var intf1 = new interface_ts_1.SKInterface("eth0");
@@ -533,6 +605,27 @@ module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACq
 
 "use strict";
 
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -582,6 +675,8 @@ var SKNetworkNamespaceLayout = /** @class */ (function (_super) {
         _this.layer2 = new layout_ts_1.SKFlowLayout("layer2", "sk-netns-intf-layer2", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
         _this.layer3 = new layout_ts_1.SKFlowLayout("layer3", "sk-netns-intf-layer3", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
         _this.layer4 = new layout_ts_1.SKFlowLayout("layer4", "sk-netns-intf-layer4", layout_ts_1.SKFlowLayoutOrientation.Vertical, _this.layerMargin, _this.layerPadding);
+        _this.svgRect
+            .style("filter", "url(#drop-shadow)");
         _super.prototype.addComponent.call(_this, new title(_this.name));
         _super.prototype.addComponent.call(_this, _this.layer1);
         _super.prototype.addComponent.call(_this, _this.layer2);
@@ -600,6 +695,90 @@ var SKNetworkNamespaceLayout = /** @class */ (function (_super) {
     return SKNetworkNamespaceLayout;
 }(layout_ts_1.SKFlowLayout));
 exports.SKNetworkNamespaceLayout = SKNetworkNamespaceLayout;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var layout_ts_1 = __webpack_require__(1);
+var SKTopology = /** @class */ (function (_super) {
+    __extends(SKTopology, _super);
+    function SKTopology(selector, width, height) {
+        var _this = _super.call(this, "Topology", "topology", layout_ts_1.SKFlowLayoutOrientation.Horizontal, {}, { x: 20, y: 20 }) || this;
+        _this.svg = d3.select(selector)
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+        _this.addDropShadowDefs();
+        _this.svg.node().appendChild(_this.render());
+        return _this;
+    }
+    SKTopology.prototype.addDropShadowDefs = function () {
+        var defs = this.svg.append("defs");
+        var filter = defs.append("filter")
+            .attr("id", "drop-shadow")
+            .attr("height", "130%");
+        filter.append("feGaussianBlur")
+            .attr("in", "SourceAlpha")
+            .attr("stdDeviation", 4)
+            .attr("result", "blur");
+        filter.append("feOffset")
+            .attr("in", "blur")
+            .attr("dx", 1)
+            .attr("dy", 2)
+            .attr("result", "offsetBlur");
+        var feMerge = filter.append("feMerge");
+        feMerge.append("feMergeNode")
+            .attr("in", "offsetBlur");
+        feMerge.append("feMergeNode")
+            .attr("in", "SourceGraphic");
+    };
+    SKTopology.prototype.setSize = function (width, height, event) {
+        // do not react on event that originate from containers
+        if (event && event.source === this) {
+            return;
+        }
+        this.svg.attr('width', width);
+        this.svg.attr('height', height);
+    };
+    return SKTopology;
+}(layout_ts_1.SKFlowLayout));
+exports.SKTopology = SKTopology;
 
 
 /***/ })

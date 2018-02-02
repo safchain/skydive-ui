@@ -4,25 +4,11 @@ import {
   SKLink } from "./src/layout.ts";
 import { SKInterface } from "./src/interface.ts";
 import { SKNetworkNamespaceLayout } from "./src/netns.ts";
+import { SKTopology } from "./src/topology.ts";
 
 declare var d3: any;
 
-var svg = d3.select("body").append("svg")
-    .attr("width", 8000)
-    .attr("height", 1200)
-  .append("g");
-
-var topology = new SKFlowLayout("Topology", "topology", SKFlowLayoutOrientation.Horizontal, {}, {x: 20, y: 20});
-var components = [topology];
-
-// append the rectangles for the bar chart
-svg.selectAll(".bar")
-  .data(components)
-.enter()
-  .append(function(d) {
-    return d.render();
-  });
-
+var topology = new SKTopology("body", 1800, 800);
 
 for (let i = 0; i != 100; i++) {
   let host1 = new SKNetworkNamespaceLayout("Host" + i, "host")
