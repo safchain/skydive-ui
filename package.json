@@ -1,0 +1,30 @@
+{
+  "name": "skydive-topology-view",
+  "version": "1.0.0",
+  "description": "Skydive topology view",
+  "main": "layout.js",
+  "dependencies": {
+    "expose-loader": "^0.7.4",
+    "ts-loader": "^3.4.0",
+    "typescript": "^2.7.1"
+  },
+  "devDependencies": {
+    "file-loader": "^1.1.6",
+    "url-loader": "^0.6.2",
+    "webpack": "^3.10.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack --watch"
+  },
+  "author": "Sylvain Afchain",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/skydive-project/skydive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/skydive-project/skydive/issues"
+  },
+  "homepage": "https://github.com/skydive-project/skydive#readme"
+}
