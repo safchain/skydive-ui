@@ -19,7 +19,7 @@
  * under the License.
  *
  */
- 
+
 import { SKEvent } from "./event.ts";
 import { SKContainer } from "./layout.ts";
 
@@ -70,6 +70,10 @@ export class SKComponent {
   containerUpdated(): void {}
 
   setPos(x: number, y: number, event?: SKEvent): void {
+    if (x == this.x && y == this.y) {
+      return;
+    }
+
     this.x = x;
     this.y = y;
     this.svgG.attr("transform", (d) => { return "translate(" + this.x + "," + this.y + ")"; })
@@ -78,10 +82,14 @@ export class SKComponent {
       event = new SKEvent(this);
     }
 
-    this.notifyUpdated(event);
+    //this.notifyUpdated(event);
   }
 
   setSize(width: number, height: number, event?: SKEvent): void {
+    if (width == this.width && height == this.height) {
+      return;
+    }
+
     this.width = width;
     this.height = height;
 

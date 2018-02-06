@@ -36,7 +36,7 @@ export class SKTopology extends SKFlowLayout {
   protected svg: any;
 
   constructor(selector, width: number, height: number) {
-    super("Topology", "topology", SKFlowLayoutOrientation.Horizontal, {}, {x: 20, y: 20})
+    super("Topology", "topology", SKFlowLayoutOrientation.Horizontal, {left: 20, top: 20, right: 20, bottom: 20}, {x: 20, y: 20})
 
     this.svg = d3.select(selector)
       .append("svg")
@@ -57,13 +57,13 @@ export class SKTopology extends SKFlowLayout {
 
     filter.append("feGaussianBlur")
         .attr("in", "SourceAlpha")
-        .attr("stdDeviation", 4)
+        .attr("stdDeviation", 5)
         .attr("result", "blur");
 
     filter.append("feOffset")
         .attr("in", "blur")
-        .attr("dx", 1)
-        .attr("dy", 2)
+        .attr("dx", 0)
+        .attr("dy", 3)
         .attr("result", "offsetBlur");
 
     var feMerge = filter.append("feMerge");
@@ -72,6 +72,20 @@ export class SKTopology extends SKFlowLayout {
         .attr("in", "offsetBlur")
     feMerge.append("feMergeNode")
         .attr("in", "SourceGraphic");
+
+    var marker = defs.append("marker")
+      .attr("id", "markerSquare")
+      .attr("markerWidth", 7)
+      .attr("markerHeight", 7)
+      .attr("refX", 4)
+      .attr("refY", 4);
+
+    marker.append("rect")
+      .attr("x", 1)
+      .attr("y", 1)
+      .attr("width", 5)
+      .attr("height", 5)
+      .attr("style", "stroke: none; fill:#000000;");
   }
 
   setSize(width: number, height: number, event?: SKEvent): void {

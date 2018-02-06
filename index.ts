@@ -10,18 +10,27 @@ declare var d3: any;
 
 var topology = new SKTopology("body", 1800, 800);
 
-for (let i = 0; i != 100; i++) {
-  let host1 = new SKNetworkNamespaceLayout("Host" + i, "host")
+for (let i = 0; i != 1; i++) {
+  let host = new SKNetworkNamespaceLayout("Host" + i, "host", true);
+  let eth0 = new SKInterface("eth0");
+  host.addComponent(eth0);
+  host.addComponent(new SKInterface("eth1"));
 
-  let intf1 = new SKInterface("eth0");
-  let intf2 = new SKInterface("eth1");
-  host1.addComponent(intf1);
-  host1.addComponent(intf2);
+  topology.addComponent(host);
 
-  topology.addComponent(host1);
+  let ns1 = new SKNetworkNamespaceLayout("NetNS 1", "netns");
+  ns1.addComponent(new SKInterface("lo"));
+  ns1.addComponent(new SKInterface("eth0"));
+
+  let ns2 = new SKNetworkNamespaceLayout("NetNS 2", "netns");
+  ns2.addComponent(new SKInterface("lo"));
+  let eth1 = new SKInterface("eth1")
+  ns2.addComponent(eth1);
+
+  host.addComponent(ns1);
+  host.addComponent(ns2);
+
+  host.addLink(new SKLink("SKLink", "link", eth0, eth1));
 }
-
-//var link1 = new SKLink("SKLink1", "link1", intf1, intf4);
-//main.addLink(link1);
 
 console.log("Started !!!!");

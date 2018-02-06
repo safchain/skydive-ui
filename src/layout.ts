@@ -58,23 +58,25 @@ export class SKLink {
     this.svgG = d3.select(gDom).attr("class", this.clazz);
 
     // create the path
-    this.svgPath = this.svgG.append("path");
+    this.svgPath = this.svgG.append("path")
+      .attr("style", "marker-start: url(#markerSquare); marker-end: url(#markerSquare);");
 
     this.invalidate()
   }
 
   endpoint(component: SKComponent, x1: number, y1: number, side: string): Array<number> {
+    var margin = 5;
     if (side === "top") {
-      return [x1, y1 - component.height / 2];
+      return [x1, y1 - component.height / 2 - margin];
     }
     if (side === "bottom") {
-      return [x1, y1 + component.height / 2];
+      return [x1, y1 + component.height / 2 + margin];
     }
     if (side === "left") {
-      return  [x1 - component.width / 2, y1];
+      return  [x1 - component.width / 2 - margin, y1];
     }
     if (side === "right") {
-      return [x1 + component.width / 2, y1];
+      return [x1 + component.width / 2 + margin, y1];
     }
   }
 
@@ -86,12 +88,12 @@ export class SKLink {
     var hh = h / 2;
     var hw = w / 2;
 
-    if (-hh <= hsw && hsw <= hh) {
+    /*if (-hh <= hsw && hsw <= hh) {
       if (x1 < x2) {
         return "right";
       }
       return "left";
-    }
+    }*/
 
     if (y1 > y2) {
       return "top";
@@ -276,34 +278,71 @@ export type SKPadding = {
   y?: number;
 };
 
+export enum SKHorizontalAlign {
+  Left = 0,
+  Right = 1,
+  Center = 2
+}
+
 export class SKFlowLayout extends SKContainer {
 
-  orientation: SKFlowLayoutOrientation
-  margin: SKMargin;
-  padding: SKPadding;
+  protected orientation: SKFlowLayoutOrientation
+  protected margin: SKMargin;
+  protected padding: SKPadding;
+  protected halign: SKHorizontalAlign;
 
-  constructor(name: string, clazz: string, orientation: SKFlowLayoutOrientation, margin: SKMargin, padding: SKPadding) {
+  constructor(name: string, clazz: string, orientation: SKFlowLayoutOrientation, margin: SKMargin, padding: SKPadding, halign?: SKHorizontalAlign) {
     super(name, clazz);
 
     this.orientation = orientation;
     this.padding = padding;
     this.margin = margin;
+    this.halign = halign || SKHorizontalAlign.Center;
   }
+
+  setSize(width: number, height: number, event?: SKEvent): void {
+    super.setSize(width, height, event);
+
+    // align content
+    if (this.halign === SKHorizontalAlign.Center) {
+      var width = 0, px = this.padding.x || 0;
+      for (let component of this.components) {
+        width += component.width + px;
+      }
+      width -= px;
+
+      var x = Math.floor((this.width - width) / 2), px = this.padding.x || 0;
+      if (x <= 0) {
+        return;
+      }
+
+      this.componentD3Data.each((d, i) => {
+        d.setPos(x, d.y, event);
+        x += d.width + px;
+      });
+    } else if (this.halign === SKHorizontalAlign.Left) {
+      // TBD
+    } else if (this.halign === SKHorizontalAlign.Right) {
+      // TBD
+    }
+  }
+
   invalidate(event: SKEvent): void {
+    // do not react on event that originate from myself
+    if (event) {
+     if (event.source === this) {
+       return;
+      }
+    } else {
+      event = new SKEvent(this);
+    }
+
     var ml = this.margin.left || 0, mr = this.margin.right || 0;
     var mt = this.margin.top || 0, mb = this.margin.bottom || 0;
 
     var x = ml, y = mt || 0, width = 0, height = 0;
 
-    // do not react on event that originate from myself
-    if (event && event.source === this) {
-      return;
-    }
-
-    var event = new SKEvent(this);
-
     var px = this.padding.x || 0, py = this.padding.x || 0;
-
     this.componentD3Data.each((d, i) => {
       d.setPos(x, y, event);
       if (this.orientation === SKFlowLayoutOrientation.Horizontal) {
@@ -324,8 +363,18 @@ export class SKFlowLayout extends SKContainer {
     } else {
       height -= py;
     }
-
     this.setSize(width + ml + mr, height + mt + mb, event);
+
+    // set content width to 100%
+    this.componentD3Data.each((d, i) => {
+      if (this.orientation === SKFlowLayoutOrientation.Vertical) {
+        if (d instanceof SKContainer) {
+          d.setSize(width, d.height);
+        }
+      } else if (this.orientation === SKFlowLayoutOrientation.Horizontal) {
+        // TBD
+      }
+    });
 
     // debounced
     this.invalidateLinks();

@@ -46,12 +46,12 @@ export class title extends SKComponent {
 
     this.svgText = this.svgG
       .append("text")
-      .attr('text-anchor', 'middle')
+      .attr("text-anchor", "middle")
       .attr('visibility', 'hidden')
       .text(this.name);
 
     // fake height because of padding
-    this.height = 8;
+    this.height = 28;
   }
 
   containerUpdated(): void {
@@ -59,7 +59,16 @@ export class title extends SKComponent {
 
     this.svgText
       .attr('visibility', 'visible')
-      .attr('x', this.container.width / 2);
+      .attr('y', 20);
+  }
+}
+
+export class header extends SKFlowLayout {
+
+  containerUpdated(): void {
+    this.width = this.container.width;
+
+    this.setSize(this.width, this.height);
   }
 }
 
@@ -75,15 +84,21 @@ export class SKNetworkNamespaceLayout extends SKFlowLayout {
   protected layer3: SKFlowLayout = new SKFlowLayout(
     "layer3", "sk-netns-intf-layer3", SKFlowLayoutOrientation.Horizontal, this.layerMargin, this.layerPadding);
   protected layer4: SKFlowLayout = new SKFlowLayout(
-    "layer4", "sk-netns-intf-layer4", SKFlowLayoutOrientation.Vertical, this.layerMargin, this.layerPadding);
+    "layer4", "sk-netns-intf-layer4", SKFlowLayoutOrientation.Horizontal, this.layerMargin, this.layerPadding);
 
-  constructor(name: string, clazz: string) {
-    super(name, clazz, SKFlowLayoutOrientation.Vertical, {top: 20}, {});
+  constructor(name: string, clazz: string, dropShadow?: boolean) {
+    super(name, clazz, SKFlowLayoutOrientation.Vertical, {top: 0, bottom: 0}, {});
 
-    this.svgRect
-      .style("filter", "url(#drop-shadow)");
+    if (dropShadow) {
+      this.svgRect
+        .style("filter", "url(#drop-shadow)");
+    }
 
-    super.addComponent(new title(this.name));
+    var titleContainer = new header(
+      "header", "sk-netns-header", SKFlowLayoutOrientation.Horizontal, {}, {});
+    titleContainer.addComponent(new title(this.name));
+
+    super.addComponent(titleContainer);
     super.addComponent(this.layer1);
     super.addComponent(this.layer2);
     super.addComponent(this.layer3);
