@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -101,9 +101,9 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var event_ts_1 = __webpack_require__(2);
+var event_ts_1 = __webpack_require__(3);
 var component_ts_1 = __webpack_require__(1);
-var debounce = __webpack_require__(5);
+var debounce = __webpack_require__(7);
 var SKLink = /** @class */ (function () {
     function SKLink(name, clazz, component1, component2) {
         this.lineGenerator = d3.line().curve(d3.curveBasis);
@@ -246,9 +246,10 @@ var SKContainer = /** @class */ (function (_super) {
     };
     // debounced
     SKContainer.prototype._notifyComponents = function () {
+        var event = new event_ts_1.SKEvent(this);
         for (var _i = 0, _a = this.components; _i < _a.length; _i++) {
             var component = _a[_i];
-            component.containerUpdated();
+            component.containerUpdated(event);
         }
     };
     // debounced
@@ -354,7 +355,7 @@ var SKFlowLayout = /** @class */ (function (_super) {
         this.componentD3Data.each(function (d, i) {
             if (_this.orientation === SKFlowLayoutOrientation.Vertical) {
                 if (d instanceof SKContainer) {
-                    d.setSize(width, d.height);
+                    d.setSize(width, d.height, event);
                 }
             }
             else if (_this.orientation === SKFlowLayoutOrientation.Horizontal) {
@@ -397,7 +398,7 @@ exports.SKFlowLayout = SKFlowLayout;
  *
  */
 exports.__esModule = true;
-var event_ts_1 = __webpack_require__(2);
+var event_ts_1 = __webpack_require__(3);
 var SKComponent = /** @class */ (function () {
     function SKComponent(name, clazz) {
         this.width = 0;
@@ -424,7 +425,7 @@ var SKComponent = /** @class */ (function () {
         }
     };
     // called by container when updated
-    SKComponent.prototype.containerUpdated = function () { };
+    SKComponent.prototype.containerUpdated = function (event) { };
     SKComponent.prototype.setPos = function (x, y, event) {
         var _this = this;
         if (x == this.x && y == this.y) {
@@ -481,6 +482,69 @@ exports.SKComponent = SKComponent;
  * under the License.
  *
  */
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var component_ts_1 = __webpack_require__(1);
+var intfImg = __webpack_require__(8);
+var SKInterface = /** @class */ (function (_super) {
+    __extends(SKInterface, _super);
+    function SKInterface(name, clazz, img) {
+        if (clazz === void 0) { clazz = "sk-interface"; }
+        if (img === void 0) { img = intfImg; }
+        var _this = _super.call(this, name, clazz) || this;
+        _this.name = name;
+        _this.clazz = clazz;
+        _this.svgImg = _this.svgG.append("image")
+            .attr("xlink:href", img)
+            .attr("width", "32px")
+            .attr("height", "32px");
+        _this.svgG.append("text")
+            .attr("y", 52)
+            .text(_this.name);
+        _this.setSize(32, 56);
+        return _this;
+    }
+    return SKInterface;
+}(component_ts_1.SKComponent));
+exports.SKInterface = SKInterface;
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
 exports.__esModule = true;
 var SKEvent = /** @class */ (function () {
     function SKEvent(source) {
@@ -492,7 +556,7 @@ exports.SKEvent = SKEvent;
 
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -530,63 +594,178 @@ var __extends = (this && this.__extends) || (function () {
 })();
 exports.__esModule = true;
 var component_ts_1 = __webpack_require__(1);
-var intfImg = __webpack_require__(6);
-var SKInterface = /** @class */ (function (_super) {
-    __extends(SKInterface, _super);
-    function SKInterface(name, clazz) {
-        if (clazz === void 0) { clazz = "sk-interface"; }
+var layout_ts_1 = __webpack_require__(0);
+var title = /** @class */ (function (_super) {
+    __extends(title, _super);
+    function title(name, clazz) {
+        if (clazz === void 0) { clazz = "sk-layout-header-title"; }
         var _this = _super.call(this, name, clazz) || this;
         _this.name = name;
         _this.clazz = clazz;
-        _this.svgImg = _this.svgG.append("image")
-            .attr("xlink:href", intfImg)
-            .attr("width", "32px")
-            .attr("height", "32px");
-        _this.svgG.append("text")
-            .attr("y", 52)
+        _this.svgText = _this.svgG
+            .append("text")
+            .attr("text-anchor", "middle")
+            .attr('visibility', 'hidden')
             .text(_this.name);
-        _this.setSize(32, 56);
+        // hack to detect the size once added to the DOM
+        var detectSize = function () {
+            setTimeout(function () {
+                var bb = _this.svgText.node().getBBox();
+                if (bb.width === 0) {
+                    return detectSize();
+                }
+                var width = bb.width, height = bb.height;
+                if (_this.width > width) {
+                    width = _this.width;
+                }
+                if (_this.height > height) {
+                    height = _this.height;
+                }
+                _this.setSize(width, height + 10);
+            }, 100);
+        };
+        detectSize();
         return _this;
     }
-    return SKInterface;
+    title.prototype.containerUpdated = function (event) {
+        this.setSize(this.container.width, this.height);
+        this.svgText
+            .attr('visibility', 'visible')
+            .attr('x', this.width / 2)
+            .attr('y', 20);
+    };
+    return title;
 }(component_ts_1.SKComponent));
-exports.SKInterface = SKInterface;
+exports.title = title;
+var header = /** @class */ (function (_super) {
+    __extends(header, _super);
+    function header() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    header.prototype.containerUpdated = function () {
+        this.width = this.container.width;
+        this.setSize(this.width, this.height);
+    };
+    return header;
+}(layout_ts_1.SKFlowLayout));
+exports.header = header;
+var SKHeaderLayout = /** @class */ (function (_super) {
+    __extends(SKHeaderLayout, _super);
+    function SKHeaderLayout(name, clazz, dropShadow) {
+        var _this = _super.call(this, name, clazz, layout_ts_1.SKFlowLayoutOrientation.Vertical, { top: 0, bottom: 0 }, {}) || this;
+        if (dropShadow) {
+            _this.svgRect
+                .style("filter", "url(#drop-shadow)");
+        }
+        var titleContainer = new header("header", "sk-layout-header", layout_ts_1.SKFlowLayoutOrientation.Horizontal, {}, {});
+        titleContainer.addComponent(new title(_this.name));
+        _super.prototype.addComponent.call(_this, titleContainer);
+        return _this;
+    }
+    return SKHeaderLayout;
+}(layout_ts_1.SKFlowLayout));
+exports.SKHeaderLayout = SKHeaderLayout;
 
 
 /***/ }),
-/* 4 */
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var header_layout_ts_1 = __webpack_require__(4);
+var SKBridge = /** @class */ (function (_super) {
+    __extends(SKBridge, _super);
+    function SKBridge() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return SKBridge;
+}(header_layout_ts_1.SKHeaderLayout));
+exports.SKBridge = SKBridge;
+
+
+/***/ }),
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 exports.__esModule = true;
 var layout_ts_1 = __webpack_require__(0);
-var interface_ts_1 = __webpack_require__(3);
-var netns_ts_1 = __webpack_require__(7);
-var topology_ts_1 = __webpack_require__(8);
+var interface_ts_1 = __webpack_require__(2);
+var netns_ts_1 = __webpack_require__(9);
+var topology_ts_1 = __webpack_require__(10);
+var ovs_ts_1 = __webpack_require__(11);
+var switch_ts_1 = __webpack_require__(12);
 var topology = new topology_ts_1.SKTopology("body", 1800, 800);
-for (var i = 0; i != 1; i++) {
-    var host = new netns_ts_1.SKNetworkNamespaceLayout("Host" + i, "host", true);
+var tor = new switch_ts_1.SKSwitch("tor1", "switch", true);
+topology.addFabricComponent(tor);
+for (var i = 0; i != 5; i++) {
+    var host = new netns_ts_1.SKNetworkNamespace("Host" + i, "host", true);
+    // add fabric port
+    var port = new switch_ts_1.SKSwitchPort("Port" + i);
+    tor.addPort(port);
     var eth0 = new interface_ts_1.SKInterface("eth0");
-    host.addComponent(eth0);
-    host.addComponent(new interface_ts_1.SKInterface("eth1"));
-    topology.addComponent(host);
-    var ns1 = new netns_ts_1.SKNetworkNamespaceLayout("NetNS 1", "netns");
-    ns1.addComponent(new interface_ts_1.SKInterface("lo"));
-    ns1.addComponent(new interface_ts_1.SKInterface("eth0"));
-    var ns2 = new netns_ts_1.SKNetworkNamespaceLayout("NetNS 2", "netns");
-    ns2.addComponent(new interface_ts_1.SKInterface("lo"));
+    host.addInterface(eth0);
+    host.addInterface(new interface_ts_1.SKInterface("eth1"));
+    topology.addLink(new layout_ts_1.SKLink("SKLink", "link", port, eth0));
+    topology.addNetNs(host);
+    var ns1 = new netns_ts_1.SKNetworkNamespace("NetNS 1", "netns");
+    ns1.addInterface(new interface_ts_1.SKInterface("lo"));
+    eth0 = new interface_ts_1.SKInterface("eth0");
+    ns1.addInterface(eth0);
+    var ns2 = new netns_ts_1.SKNetworkNamespace("NetNS 2", "netns");
+    ns2.addInterface(new interface_ts_1.SKInterface("lo"));
     var eth1 = new interface_ts_1.SKInterface("eth1");
-    ns2.addComponent(eth1);
-    host.addComponent(ns1);
-    host.addComponent(ns2);
-    host.addLink(new layout_ts_1.SKLink("SKLink", "link", eth0, eth1));
+    ns2.addInterface(eth1);
+    host.addNetNS(ns1);
+    host.addNetNS(ns2);
+    var obridge = new ovs_ts_1.SKOvsBridge("br-int", "ovsbridge");
+    var oport0 = new ovs_ts_1.SKOvsPort("port0", "ovsport");
+    obridge.addPort(oport0);
+    var oport1 = new ovs_ts_1.SKOvsPort("port1", "ovsport");
+    obridge.addPort(oport1);
+    host.addLink(new layout_ts_1.SKLink("SKLink", "link", oport0, eth0));
+    host.addLink(new layout_ts_1.SKLink("SKLink", "link", oport1, eth1));
+    host.addBridge(obridge);
 }
 console.log("Started !!!!");
 
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports) {
 
 /**
@@ -658,13 +837,13 @@ module.exports = function debounce(func, wait, immediate){
 
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports) {
 
 module.exports = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAiEgAAIhIBv2R/3AAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAASCSURBVHic7Zs9aBxHFMf/b07DEYRQwMTIJCnCIdIErbibvcPpA+lCKqcwDqRIYRdOFURcRDIkURkMThEwhBCMrSIBF6lTXSztrNBBWhHIBxI2jmJEMMd656WZM6e5Pdl77Ic+9tfoNPPe7v+9fTe77M0jZsY4PM87K6X0mVkJIVrMrACcG+twNNghIm2MCYlIR1EU9Hq9B+OMKSkBSilJRNeY+TMAMk+1BRAx8xdE9KXWOnInRxLQbrcXjTHfAfAKElgUPWPMh5ubm73hQTH8j1LqsjFmAycveADwhBCBUury8OCzCrBXfgOHl7wBsJ+fxkyYgXNhHSJjjD+oBGJmKKUkgADJV34XwKoQIuj3+71er/df9pqzw/O86Xq97hljfABLAOYSzHoAfK11NAUAdsEbCZ6I7gohrqyvrz/KV3Z22AvUBdDtdDo/GGNuMvMFx8wjomsAlmlhYeGslPIvOKVPRHeDIPigIN254vv+nYQkRFEUvSaklD5Gv/e7QogrBenLHRvLrjMspZS+sA83LqvHqeyfh41l1R23D3ii5U4IIYJClBVIUkxCiFZSBZh+v99zjY87NiYzPMbMSmD02X7/qN/qJsHG5D7DnDvsgeFUMFXUiTzPm5ZSvsXMdJgdEXEURb8VVYWFJEAptSSlXAIwS3Ro/AAAKeVjpdSq1npk5c6a3L8C7XZ7DsB1ALMp3GYBXLe+uZJ7Apj5HUz2TkFa31zJPQHGmFoZvi/Kqb8LVAkoW0DZTHQbbLVa7wshPmbmN55nS0RpVn/X9yul1NIL2P1ujPk2DMOf0p4jdQKazeZ5IcSPh71Oz5A5JL/ROQAzv0lE7zabzbc3Nzd/TXOC1F8BIcRHaX2KYhJtk6wBr0zgUxSptZ36RbBKQNkCyqZKQNkCyqZKQNkCyqZKQNkCyqZKQNkCyqZKQNkCyiaPBNxg5jtj5u4z8zKAvYS5PTt3P8nRHvNGJgqHyDQBzNzVWl9tNBoXAYzszYvj+FIYhisAbiW43wrDcCWO40sJcw8ajcZFrfVVZu5mqTnTBBDRQwBYW1uLkXyVH9q/SXsPHjk2w+zZYz47R1ZUa0DZAsqmSkDZAsomdQKIKM5DSBZMom2SCvh5Ap+iSK0tdQKklLeZ+R6Ao1QJMTPfk1LeTuuY+pehbrf7BMB7i4uLr9ZqtdcPHGxq6p/BZ2PMBSJ6aXh+fn5+3859T0S/DM8x8x8Dm+3t7fPO3JPB51qt9unTp08P7ByJ4/jPra2tv9PGAgDUarXc37gea61fnuRgRx2l1L9wdqpUdwEAO87YjOd502WIyRMb04wzvCOISDuDol6vn7iOERvTgYonIi2MMaFrbJsNThRJMRljwqQKAIClTqdzpgBdhWBjGdloQURaRFEUAHDbyeaMMTcLUVcANhZ3o0UURVFAzAzf95eZ+XPX8Ti2zAzT6XTOjGmZARGtBEGwfOqbpqq2ueHNTrap8Gsc/3bZcUQAPtFafzMYqFpnXauNjY0tAD4RrWD07nAciezrdt8NHhjTPT7gNLTP/w/2Wg/RCVel1AAAAABJRU5ErkJggg=="
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -701,84 +880,43 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 exports.__esModule = true;
-var component_ts_1 = __webpack_require__(1);
-var interface_ts_1 = __webpack_require__(3);
 var layout_ts_1 = __webpack_require__(0);
-var title = /** @class */ (function (_super) {
-    __extends(title, _super);
-    function title(name, clazz) {
-        if (clazz === void 0) { clazz = "sk-netns-title"; }
-        var _this = _super.call(this, name, clazz) || this;
-        _this.name = name;
-        _this.clazz = clazz;
-        _this.svgText = _this.svgG
-            .append("text")
-            .attr("text-anchor", "middle")
-            .attr('visibility', 'hidden')
-            .text(_this.name);
-        // fake height because of padding
-        _this.height = 28;
-        return _this;
-    }
-    title.prototype.containerUpdated = function () {
-        this.width = this.container.width;
-        this.svgText
-            .attr('visibility', 'visible')
-            .attr('y', 20);
-    };
-    return title;
-}(component_ts_1.SKComponent));
-exports.title = title;
-var header = /** @class */ (function (_super) {
-    __extends(header, _super);
-    function header() {
-        return _super !== null && _super.apply(this, arguments) || this;
-    }
-    header.prototype.containerUpdated = function () {
-        this.width = this.container.width;
-        this.setSize(this.width, this.height);
-    };
-    return header;
-}(layout_ts_1.SKFlowLayout));
-exports.header = header;
-var SKNetworkNamespaceLayout = /** @class */ (function (_super) {
-    __extends(SKNetworkNamespaceLayout, _super);
-    function SKNetworkNamespaceLayout(name, clazz, dropShadow) {
-        var _this = _super.call(this, name, clazz, layout_ts_1.SKFlowLayoutOrientation.Vertical, { top: 0, bottom: 0 }, {}) || this;
+var header_layout_ts_1 = __webpack_require__(4);
+var SKNetworkNamespace = /** @class */ (function (_super) {
+    __extends(SKNetworkNamespace, _super);
+    function SKNetworkNamespace(name, clazz, dropShadow) {
+        var _this = _super.call(this, name, clazz, dropShadow) || this;
         _this.layerMargin = { left: 20, right: 20, top: 20, bottom: 20 };
         _this.layerPadding = { x: 20, y: 20 };
-        _this.layer1 = new layout_ts_1.SKFlowLayout("layer1", "sk-netns-intf-layer1", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
-        _this.layer2 = new layout_ts_1.SKFlowLayout("layer2", "sk-netns-intf-layer2", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
-        _this.layer3 = new layout_ts_1.SKFlowLayout("layer3", "sk-netns-intf-layer3", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
-        _this.layer4 = new layout_ts_1.SKFlowLayout("layer4", "sk-netns-intf-layer4", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
-        if (dropShadow) {
-            _this.svgRect
-                .style("filter", "url(#drop-shadow)");
-        }
-        var titleContainer = new header("header", "sk-netns-header", layout_ts_1.SKFlowLayoutOrientation.Horizontal, {}, {});
-        titleContainer.addComponent(new title(_this.name));
-        _super.prototype.addComponent.call(_this, titleContainer);
+        _this.layer1 = new layout_ts_1.SKFlowLayout("layer1", "sk-netns-layer1", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
+        _this.layer2 = new layout_ts_1.SKFlowLayout("layer2", "sk-netns-layer2", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
+        _this.layer3 = new layout_ts_1.SKFlowLayout("layer3", "sk-netns-layer3", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
+        _this.layer4 = new layout_ts_1.SKFlowLayout("layer4", "sk-netns-layer4", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
         _super.prototype.addComponent.call(_this, _this.layer1);
         _super.prototype.addComponent.call(_this, _this.layer2);
         _super.prototype.addComponent.call(_this, _this.layer3);
         _super.prototype.addComponent.call(_this, _this.layer4);
         return _this;
     }
-    SKNetworkNamespaceLayout.prototype.addComponent = function (component) {
-        if (component instanceof interface_ts_1.SKInterface) {
-            this.layer1.addComponent(component);
-        }
-        if (component instanceof SKNetworkNamespaceLayout) {
-            this.layer4.addComponent(component);
-        }
+    SKNetworkNamespace.prototype.addComponent = function (component) {
+        throw new Error("private");
     };
-    return SKNetworkNamespaceLayout;
-}(layout_ts_1.SKFlowLayout));
-exports.SKNetworkNamespaceLayout = SKNetworkNamespaceLayout;
+    SKNetworkNamespace.prototype.addInterface = function (intf) {
+        this.layer1.addComponent(intf);
+    };
+    SKNetworkNamespace.prototype.addBridge = function (bridge) {
+        this.layer2.addComponent(bridge);
+    };
+    SKNetworkNamespace.prototype.addNetNS = function (netns) {
+        this.layer4.addComponent(netns);
+    };
+    return SKNetworkNamespace;
+}(header_layout_ts_1.SKHeaderLayout));
+exports.SKNetworkNamespace = SKNetworkNamespace;
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -819,13 +957,19 @@ var layout_ts_1 = __webpack_require__(0);
 var SKTopology = /** @class */ (function (_super) {
     __extends(SKTopology, _super);
     function SKTopology(selector, width, height) {
-        var _this = _super.call(this, "Topology", "topology", layout_ts_1.SKFlowLayoutOrientation.Horizontal, { left: 20, top: 20, right: 20, bottom: 20 }, { x: 20, y: 20 }) || this;
+        var _this = _super.call(this, "Topology", "topology", layout_ts_1.SKFlowLayoutOrientation.Vertical, { left: 20, top: 20, right: 20, bottom: 20 }, { x: 20, y: 20 }) || this;
+        _this.layerMargin = { left: 20, right: 20, top: 20, bottom: 20 };
+        _this.layerPadding = { x: 20, y: 20 };
+        _this.layer1 = new layout_ts_1.SKFlowLayout("layer1", "sk-topology-layer1", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
+        _this.layer2 = new layout_ts_1.SKFlowLayout("layer2", "sk-topology-layer2", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
         _this.svg = d3.select(selector)
             .append("svg")
             .attr("width", width)
             .attr("height", height);
         _this.addDropShadowDefs();
         _this.svg.node().appendChild(_this.render());
+        _super.prototype.addComponent.call(_this, _this.layer1);
+        _super.prototype.addComponent.call(_this, _this.layer2);
         return _this;
     }
     SKTopology.prototype.addDropShadowDefs = function () {
@@ -858,7 +1002,7 @@ var SKTopology = /** @class */ (function (_super) {
             .attr("y", 1)
             .attr("width", 5)
             .attr("height", 5)
-            .attr("style", "stroke: none; fill:#000000;");
+            .attr("style", "stroke: none; fill: #000000;");
     };
     SKTopology.prototype.setSize = function (width, height, event) {
         // do not react on event that originate from containers
@@ -868,9 +1012,159 @@ var SKTopology = /** @class */ (function (_super) {
         this.svg.attr('width', width);
         this.svg.attr('height', height);
     };
+    SKTopology.prototype.addComponent = function (component) {
+        throw new Error("private");
+    };
+    SKTopology.prototype.addFabricComponent = function (component) {
+        this.layer1.addComponent(component);
+    };
+    SKTopology.prototype.addNetNs = function (netns) {
+        this.layer2.addComponent(netns);
+    };
     return SKTopology;
 }(layout_ts_1.SKFlowLayout));
 exports.SKTopology = SKTopology;
+
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var interface_ts_1 = __webpack_require__(2);
+var layout_ts_1 = __webpack_require__(0);
+var bridge_ts_1 = __webpack_require__(5);
+var SKOvsPort = /** @class */ (function (_super) {
+    __extends(SKOvsPort, _super);
+    function SKOvsPort() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return SKOvsPort;
+}(interface_ts_1.SKInterface));
+exports.SKOvsPort = SKOvsPort;
+var SKOvsBridge = /** @class */ (function (_super) {
+    __extends(SKOvsBridge, _super);
+    function SKOvsBridge(name, clazz, dropShadow) {
+        var _this = _super.call(this, name, clazz, dropShadow) || this;
+        _this.layerMargin = { left: 20, right: 20, top: 10, bottom: 10 };
+        _this.layerPadding = { x: 20, y: 20 };
+        _this.ports = new layout_ts_1.SKFlowLayout("ports", "sk-ovs-ports", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
+        _super.prototype.addComponent.call(_this, _this.ports);
+        return _this;
+    }
+    SKOvsBridge.prototype.addComponent = function (component) {
+        throw new Error("private");
+    };
+    SKOvsBridge.prototype.addPort = function (port) {
+        this.ports.addComponent(port);
+    };
+    return SKOvsBridge;
+}(bridge_ts_1.SKBridge));
+exports.SKOvsBridge = SKOvsBridge;
+
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+exports.__esModule = true;
+var interface_ts_1 = __webpack_require__(2);
+var layout_ts_1 = __webpack_require__(0);
+var header_layout_ts_1 = __webpack_require__(4);
+var SKSwitchPort = /** @class */ (function (_super) {
+    __extends(SKSwitchPort, _super);
+    function SKSwitchPort() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    return SKSwitchPort;
+}(interface_ts_1.SKInterface));
+exports.SKSwitchPort = SKSwitchPort;
+var SKSwitch = /** @class */ (function (_super) {
+    __extends(SKSwitch, _super);
+    function SKSwitch(name, clazz, dropShadow) {
+        if (clazz === void 0) { clazz = "switch"; }
+        var _this = _super.call(this, name, clazz, dropShadow) || this;
+        _this.layerMargin = { left: 20, right: 20, top: 10, bottom: 10 };
+        _this.layerPadding = { x: 20, y: 20 };
+        _this.ports = new layout_ts_1.SKFlowLayout("ports", "sk-switch-ports", layout_ts_1.SKFlowLayoutOrientation.Horizontal, _this.layerMargin, _this.layerPadding);
+        _super.prototype.addComponent.call(_this, _this.ports);
+        return _this;
+    }
+    SKSwitch.prototype.addComponent = function (component) {
+        throw new Error("private");
+    };
+    SKSwitch.prototype.addPort = function (port) {
+        this.ports.addComponent(port);
+    };
+    return SKSwitch;
+}(header_layout_ts_1.SKHeaderLayout));
+exports.SKSwitch = SKSwitch;
 
 
 /***/ })

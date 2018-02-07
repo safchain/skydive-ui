@@ -238,8 +238,9 @@ export abstract class SKContainer extends SKComponent {
 
   // debounced
   _notifyComponents(): void {
+    var event = new SKEvent(this);
     for (let component of this.components) {
-      component.containerUpdated();
+      component.containerUpdated(event);
     }
   }
 
@@ -369,7 +370,7 @@ export class SKFlowLayout extends SKContainer {
     this.componentD3Data.each((d, i) => {
       if (this.orientation === SKFlowLayoutOrientation.Vertical) {
         if (d instanceof SKContainer) {
-          d.setSize(width, d.height);
+          d.setSize(width, d.height, event);
         }
       } else if (this.orientation === SKFlowLayoutOrientation.Horizontal) {
         // TBD

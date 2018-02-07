@@ -27,16 +27,25 @@ import {
   SKFlowLayoutOrientation,
   SKMargin,
   SKPadding} from "./layout.ts";
+import { SKNetworkNamespace } from "./netns.ts";
 
 declare var d3: any;
 
 export class SKTopology extends SKFlowLayout {
 
+  private layerMargin: SKMargin = {left: 20, right: 20, top: 20, bottom: 20};
+  private layerPadding: SKPadding = {x: 20, y: 20};
+
+  protected layer1: SKFlowLayout = new SKFlowLayout(
+    "layer1", "sk-topology-layer1", SKFlowLayoutOrientation.Horizontal, this.layerMargin, this.layerPadding);
+  protected layer2: SKFlowLayout = new SKFlowLayout(
+    "layer2", "sk-topology-layer2", SKFlowLayoutOrientation.Horizontal, this.layerMargin, this.layerPadding);
+
   // svg
   protected svg: any;
 
   constructor(selector, width: number, height: number) {
-    super("Topology", "topology", SKFlowLayoutOrientation.Horizontal, {left: 20, top: 20, right: 20, bottom: 20}, {x: 20, y: 20})
+    super("Topology", "topology", SKFlowLayoutOrientation.Vertical, {left: 20, top: 20, right: 20, bottom: 20}, {x: 20, y: 20})
 
     this.svg = d3.select(selector)
       .append("svg")
@@ -46,6 +55,9 @@ export class SKTopology extends SKFlowLayout {
     this.addDropShadowDefs();
 
     this.svg.node().appendChild(this.render());
+
+    super.addComponent(this.layer1);
+    super.addComponent(this.layer2);
   }
 
   private addDropShadowDefs(): void {
@@ -85,7 +97,7 @@ export class SKTopology extends SKFlowLayout {
       .attr("y", 1)
       .attr("width", 5)
       .attr("height", 5)
-      .attr("style", "stroke: none; fill:#000000;");
+      .attr("style", "stroke: none; fill: #000000;");
   }
 
   setSize(width: number, height: number, event?: SKEvent): void {
@@ -96,5 +108,17 @@ export class SKTopology extends SKFlowLayout {
 
     this.svg.attr('width', width);
     this.svg.attr('height', height);
+  }
+
+  addComponent(component: SKComponent): void {
+    throw new Error("private");
+  }
+
+  addFabricComponent(component: SKComponent): void {
+    this.layer1.addComponent(component);
+  }
+
+  addNetNs(netns: SKNetworkNamespace): void {
+    this.layer2.addComponent(netns);
   }
 }

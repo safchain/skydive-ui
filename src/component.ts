@@ -67,7 +67,7 @@ export class SKComponent {
   }
 
   // called by container when updated
-  containerUpdated(): void {}
+  containerUpdated(event?: SKEvent): void {}
 
   setPos(x: number, y: number, event?: SKEvent): void {
     if (x == this.x && y == this.y) {

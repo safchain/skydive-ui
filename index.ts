@@ -3,34 +3,56 @@ import {
   SKFlowLayoutOrientation,
   SKLink } from "./src/layout.ts";
 import { SKInterface } from "./src/interface.ts";
-import { SKNetworkNamespaceLayout } from "./src/netns.ts";
+import { SKNetworkNamespace } from "./src/netns.ts";
 import { SKTopology } from "./src/topology.ts";
+import { SKOvsBridge, SKOvsPort } from "./src/ovs.ts";
+import { SKSwitch, SKSwitchPort } from "./src/switch.ts";
 
 declare var d3: any;
 
 var topology = new SKTopology("body", 1800, 800);
 
-for (let i = 0; i != 1; i++) {
-  let host = new SKNetworkNamespaceLayout("Host" + i, "host", true);
+let tor = new SKSwitch("tor1", "switch", true);
+topology.addFabricComponent(tor);
+
+for (let i = 0; i != 5; i++) {
+  let host = new SKNetworkNamespace("Host" + i, "host", true);
+
+  // add fabric port
+  let port = new SKSwitchPort("Port" + i);
+  tor.addPort(port);
+
   let eth0 = new SKInterface("eth0");
-  host.addComponent(eth0);
-  host.addComponent(new SKInterface("eth1"));
+  host.addInterface(eth0);
+  host.addInterface(new SKInterface("eth1"));
 
-  topology.addComponent(host);
+  topology.addLink(new SKLink("SKLink", "link", port, eth0));
 
-  let ns1 = new SKNetworkNamespaceLayout("NetNS 1", "netns");
-  ns1.addComponent(new SKInterface("lo"));
-  ns1.addComponent(new SKInterface("eth0"));
+  topology.addNetNs(host);
 
-  let ns2 = new SKNetworkNamespaceLayout("NetNS 2", "netns");
-  ns2.addComponent(new SKInterface("lo"));
+  let ns1 = new SKNetworkNamespace("NetNS 1", "netns");
+  ns1.addInterface(new SKInterface("lo"));
+  eth0 = new SKInterface("eth0");
+  ns1.addInterface(eth0);
+
+  let ns2 = new SKNetworkNamespace("NetNS 2", "netns");
+  ns2.addInterface(new SKInterface("lo"));
   let eth1 = new SKInterface("eth1")
-  ns2.addComponent(eth1);
+  ns2.addInterface(eth1);
 
-  host.addComponent(ns1);
-  host.addComponent(ns2);
+  host.addNetNS(ns1);
+  host.addNetNS(ns2);
 
-  host.addLink(new SKLink("SKLink", "link", eth0, eth1));
+  let obridge = new SKOvsBridge("br-int", "ovsbridge");
+  let oport0 = new SKOvsPort("port0", "ovsport");
+  obridge.addPort(oport0);
+  let oport1 = new SKOvsPort("port1", "ovsport");
+  obridge.addPort(oport1);
+
+  host.addLink(new SKLink("SKLink", "link", oport0, eth0));
+  host.addLink(new SKLink("SKLink", "link", oport1, eth1));
+
+  host.addBridge(obridge);
 }
 
 console.log("Started !!!!");
