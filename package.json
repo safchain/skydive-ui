@@ -1,0 +1,27 @@
+{
+  "name": "skydive.network.topology",
+  "version": "1.0.0",
+  "description": "Skydive Network Topology view",
+  "main": ".eslintrc.js",
+  "scripts": {
+    "build": "webpack",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "css-loader": "^1.0.0",
+    "ts-loader": "^4.4.2",
+    "typescript": "^2.9.2",
+    "typings-for-css-modules-loader": "^1.7.0",
+    "vue": "^2.5.16",
+    "vue-loader": "^15.2.6",
+    "vue-template-compiler": "^2.5.16",
+    "webpack": "^4.16.2",
+    "webpack-cli": "^3.1.0"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.115",
+    "lodash": "^4.17.10"
+  }
+}
