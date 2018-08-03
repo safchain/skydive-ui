@@ -1,21 +1,35 @@
+/*
+ * Copyright (C) 2018 Red Hat, Inc.
+ *
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ *
+ */
+
 import Vue from "vue";
 
 import * as _ from "lodash";
+import * as d3 from "d3";
 
 import ContainerComponent from "./container";
-import LinkComponent from "./link";
+import LinkComponent, { LinkAnchor } from "./link";
 import TopologyModel from "../models/topology";
 import LinkModel from "../models/link";
 import NodeModel from "../models/node";
-
-declare var d3: any;
-
-enum Anchor {
-    Left = 1,
-    Top,
-    Right,
-    Bottom
-}
 
 export default Vue.extend({
     template: `
@@ -32,25 +46,30 @@ export default Vue.extend({
                     </marker>
                 </defs>
                 <g v-for="link in links">
-                    {{link}}
-                    <link-component :x1="link.x1" :y1="link.y1" :x2="link.x2" :y2="link.y2"/>
+                    <link-component :id="link.linkModel.ID" :x1="link.x1" :y1="link.y1" :anchor1="link.anchor1" 
+                        :x2="link.x2" :y2="link.y2" :anchor2="link.anchor2"/>
                 </g>
             </svg>
             <div :id="model.ID">
                 This is a topology {{model.name}}
                 <div v-for="container in model.containers">
-                    <container-component :model="container" :onNodeDomUpdate="onNodeDomUpdate"/>
+                    <container-component :model="container" :onContainerDomUpdate="onContainerDomUpdate"/>
                 </div>
             </div>
         </div>
     `,
 
-    props: ['model'],
+    props: {
+        model: {
+            type: TopologyModel,
+            required: true
+        }
+    },
 
 
     data() {
         return {
-            svg: null,
+            svg: {},
             links: new Array<Link>(),
             nodeLinks: new Map<string, Array<Link>>()
         }
@@ -88,25 +107,32 @@ export default Vue.extend({
         },
 
         updateLinks: function() {
-            for (let l of this.model.links) {
-                let updated = this.links.some(link => {
-                    if (link.linkModel.ID === l.ID) {
-                        link.update();
-                        return true;
-                    }
-                    return false;
-                });
-                if (!updated) {
-                    var link = new Link(l);
-                    this.links.push(link)
+            var cmp = (l: Link, lm: LinkModel): boolean => {
+                return l.linkModel.ID === lm.ID;
+            }
 
-                    this.updateNodeLinkMap(link);
-                }
-                console.log(this.links);
+            var toUpdate = _.intersectionWith(this.links, this.model.links, cmp);
+            for (let link of toUpdate) {
+                link.update();
+            }
+
+            var toDelete = _.differenceWith(this.links, this.model.links, cmp);
+            for (let link of toDelete) {
+                _.remove(this.links, l => { return l.linkModel.ID === link.linkModel.ID; });
+            }
+
+            var toAdd = _.differenceWith(this.model.links, this.links, (lm: LinkModel, l: Link): boolean => {
+                return l.linkModel.ID === lm.ID;
+            });
+            for (let link of toAdd) {
+                var l = new Link(link);
+                this.links.push(l)
+
+                this.updateNodeLinkMap(l);
             }
         },
 
-        onNodeDomUpdate: function(nodes: Array<NodeModel>) {
+        onContainerDomUpdate: function(nodes: Array<NodeModel>) {
             for (let node of nodes) {
                 var links = this.nodeLinks.get(node.ID)
                 if (links) {
@@ -126,10 +152,12 @@ export default Vue.extend({
 
 class Link {
     linkModel: LinkModel;
-    x1: number = 0;
-    y1: number = 0;
-    x2: number = 0;
-    y2: number = 0;
+    x1: Number = 0;
+    y1: Number = 0;
+    anchor1: LinkAnchor = LinkAnchor.Top;
+    x2: Number = 0;
+    y2: Number = 0;
+    anchor2: LinkAnchor = LinkAnchor.Bottom;
 
     constructor(link: LinkModel) {
         this.linkModel = link;
@@ -137,7 +165,7 @@ class Link {
         this.update();
     }
 
-    anchorSide(bb: ClientRect, x1: number, y1: number, x2: number, y2: number): Anchor {
+    anchorSide(bb: ClientRect, x1: number, y1: number, x2: number, y2: number): LinkAnchor {
         var w = bb.width, h = bb.height;
         var slope = (y1 - y2) / (x1 - x2);
         var hsw = slope * w / 2;
@@ -153,28 +181,28 @@ class Link {
         //}
     
         if (y1 > y2) {
-            return Anchor.Top;
+            return LinkAnchor.Top;
         }
 
-        return Anchor.Bottom;
+        return LinkAnchor.Bottom;
     }
 
-    endpoint(bb: ClientRect, x1: number, y1: number, anchor: Anchor): Array<number> {
+    endpoint(bb: ClientRect, x: number, y: number, anchor: LinkAnchor): [number, number] {
         // TODO make it custom
         var margin = 5;
         
-        if (anchor === Anchor.Top) {
-            return [x1, y1 - bb.height / 2 - margin];
+        if (anchor === LinkAnchor.Top) {
+            return [x, y - bb.height / 2 - margin];
         }
-        if (anchor === Anchor.Bottom) {
-            return [x1, y1 + bb.height / 2 + margin];
+        if (anchor === LinkAnchor.Bottom) {
+            return [x, y + bb.height / 2 + margin];
         }
-        if (anchor === Anchor.Left) {
-            return  [x1 - bb.width / 2 - margin, y1];
+        if (anchor === LinkAnchor.Left) {
+            return  [x - bb.width / 2 - margin, y];
         }
         
         // right
-        return [x1 + bb.width / 2 + margin, y1];
+        return [x + bb.width / 2 + margin, y];
     }
 
     update(): void {
@@ -201,5 +229,7 @@ class Link {
         this.y1 = e1[1];
         this.x2 = e2[0];
         this.y2 = e2[1];
+        this.anchor1 = a1;
+        this.anchor2 = a2;
     }
 }

@@ -22,48 +22,28 @@
 
 import Vue from "vue";
 
-import ResizeObserver from 'resize-observer-polyfill';
+import NodeComponent from './node'
+import * as intfImg from "../../assets/img/intf.png";
 
 export default Vue.extend({
+    extends: NodeComponent,
+
     template: `
         <div :id="model.ID" v-bind:class="['node', model.type]">
+            <img :src="intfImg" width="32" height="32"/><br/>
             {{model.name}}
         </div>
     `,
 
     props: [
         'model',
-        'onNodeDomUpdate'
+        'onNodeDomUpdate',
+        'img'
     ],
 
     data() {
         return {
-            observer: new MutationObserver(mutations => {
-                this.onNodeDomUpdate(this.model);
-            }),
-            resizeObserver: new ResizeObserver((entries, observer) => {
-                this.onNodeDomUpdate(this.model);
-            })
+            intfImg: intfImg
         }
-    },
-
-    mounted: function() {
-        var target = document.getElementById(this.model.ID);
-        if (target) {
-            this.observer.observe(target, { 
-                characterData: true,
-                attributes: true,
-                childList: true 
-            });
-            this.resizeObserver.observe(target);
-        }
-    },
-
-    beforeDestroy: function() {
-        this.observer.disconnect();
-        this.resizeObserver.disconnect();
-    },
-
-    components: {
     }
 });

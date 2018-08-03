@@ -10,7 +10,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/d3": "^5.0.0",
+    "@types/lodash": "^4.14.115",
     "css-loader": "^1.0.0",
+    "d3": "^5.5.0",
+    "file-loader": "^1.1.11",
+    "lodash": "^4.17.10",
+    "resize-observer-polyfill": "^1.5.0",
     "ts-loader": "^4.4.2",
     "typescript": "^2.9.2",
     "typings-for-css-modules-loader": "^1.7.0",
@@ -20,8 +26,5 @@
     "webpack": "^4.16.2",
     "webpack-cli": "^3.1.0"
   },
-  "dependencies": {
-    "@types/lodash": "^4.14.115",
-    "lodash": "^4.17.10"
-  }
+  "dependencies": {}
 }
