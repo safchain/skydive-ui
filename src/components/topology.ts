@@ -25,7 +25,7 @@ import Vue from "vue";
 import * as _ from "lodash";
 import * as d3 from "d3";
 
-import ContainerComponent from "./container";
+import HostComponent from "./host";
 import LinkComponent, { LinkAnchor } from "./link";
 import TopologyModel from "../models/topology";
 import LinkModel from "../models/link";
@@ -33,7 +33,7 @@ import NodeModel from "../models/node";
 
 export default Vue.extend({
     template: `
-        <div class="topology" ref="topology">
+        <div class="topology">
             <svg :id="'svg-' + model.ID" class="links">
                 <defs>
                     <marker id="markerSquare"
@@ -50,10 +50,9 @@ export default Vue.extend({
                         :x2="link.x2" :y2="link.y2" :anchor2="link.anchor2"/>
                 </g>
             </svg>
-            <div :id="model.ID">
-                This is a topology {{model.name}}
-                <div v-for="container in model.containers">
-                    <container-component :model="container" :onContainerDomUpdate="onContainerDomUpdate"/>
+            <div :id="model.ID" class="hosts">
+                <div v-for="host in model.hosts">
+                    <host-component :model="host" :onDomUpdate="onDomUpdate"/>
                 </div>
             </div>
         </div>
@@ -66,12 +65,10 @@ export default Vue.extend({
         }
     },
 
-
     data() {
         return {
             svg: {},
-            links: new Array<Link>(),
-            nodeLinks: new Map<string, Array<Link>>()
+            links: new Array<Link>()
         }
     },
 
@@ -90,22 +87,6 @@ export default Vue.extend({
     },
 
     methods: {
-        updateNodeLinkMap: function(link: Link) {
-            var links = this.nodeLinks.get(link.linkModel.node1.ID);
-            if (!links) {
-                links = new Array<Link>();
-                this.nodeLinks.set(link.linkModel.node1.ID, links);
-            }
-            links.push(link);
-
-            links = this.nodeLinks.get(link.linkModel.node2.ID);
-            if (!links) {
-                links = new Array<Link>();
-                this.nodeLinks.set(link.linkModel.node2.ID, links);
-            }
-            links.push(link);
-        },
-
         updateLinks: function() {
             var cmp = (l: Link, lm: LinkModel): boolean => {
                 return l.linkModel.ID === lm.ID;
@@ -126,27 +107,20 @@ export default Vue.extend({
             });
             for (let link of toAdd) {
                 var l = new Link(link);
-                this.links.push(l)
-
-                this.updateNodeLinkMap(l);
+                this.links.push(l);
             }
         },
 
-        onContainerDomUpdate: function(nodes: Array<NodeModel>) {
-            for (let node of nodes) {
-                var links = this.nodeLinks.get(node.ID)
-                if (links) {
-                    for (let link of links) {
-                        link.update();
-                    }
-                }
+        onDomUpdate: function() {
+            for (let link of this.links) {
+                link.update();
             }
         }
     },
 
     components: {
-        ContainerComponent,
-        LinkComponent
+        LinkComponent,
+        HostComponent
     }
 });
 

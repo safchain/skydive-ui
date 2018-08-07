@@ -24,54 +24,36 @@ import Vue from "vue";
 
 import ResizeObserver from 'resize-observer-polyfill';
 
-import NodeModel from '../models/node'
+import IntfComponent from "./intf";
+import HolderComponent from "./holder";
+import IntfsHolderComponent from "./intfs-holder";
+
+import OvsBridgeModel from "../models/ovsbridge";
 
 export default Vue.extend({
+    extends: HolderComponent,
+
     template: `
-        <div :id="node.ID" v-bind:class="['node', node.type]">
-            {{node.name}}
+        <div :id="model.ID" v-bind:class="['container', 'ovsbridge']" style="display: inline-block">
+            <div class="header" style="text-align: center">
+                <div class="title">{{model.name}}</div>
+            </div>
+            <div :id="model.ID + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
+                <intfs-holder-component :id="model.ID + '-ports'" :intfs="model.ports" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <intfs-holder-component :id="model.ID + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>    
+            </div>
         </div>
     `,
 
     props: {
         model: {
-            type: NodeModel,
-            required: true
-        },
-        onDomUpdate: {
-            type: Object,
+            type: OvsBridgeModel,
             required: true
         }
-    },
-
-    data() {
-        return {
-            observer: new MutationObserver(mutations => {
-                this.onDomUpdate();
-            }),
-            resizeObserver: new ResizeObserver((entries, observer) => {
-                this.onDomUpdate();
-            })
-        }
-    },
-
-    mounted: function() {
-        var target = document.getElementById(this.model.ID);
-        if (target) {
-            this.observer.observe(target, { 
-                characterData: true,
-                attributes: true,
-                childList: true 
-            });
-            this.resizeObserver.observe(target);
-        }
-    },
-
-    beforeDestroy: function() {
-        this.observer.disconnect();
-        this.resizeObserver.disconnect();
     },
 
     components: {
+        IntfComponent,
+        IntfsHolderComponent
     }
 });

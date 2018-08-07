@@ -22,32 +22,39 @@
 
 import Vue from "vue";
 
-import * as intfImg from '../../assets/img/intf.png';
+import ResizeObserver from 'resize-observer-polyfill';
 
-import NodeComponent from './node'
-
-import IntfModel from '../models/intf'
+import HolderComponent from "./holder";
+import IntfComponent from "./intf";
 
 export default Vue.extend({
-    extends: NodeComponent,
+    extends: HolderComponent,
 
     template: `
-        <div :id="model.ID" v-bind:class="['node', model.type]">
-            <img :src="intfImg" width="32" height="32"/><br/>
-            {{model.name}}
+        <div :id="id" class="intf-holder" style="display: inline-block">
+            <div :id="id + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
+                <div v-for="intf in intfs">
+                    <intf-component :model="intf" :onDomUpdate="onDomUpdate"/>
+                </div>
+            </div>
         </div>
     `,
 
     props: {
-        model: {
-            type: IntfModel,
+        id: {
+            type: String,
             required: true
+        },
+        intfs: {
+            type: Array,
+            required: true
+        },
+        direction: {
+            type: String
         }
     },
 
-    data() {
-        return {
-            intfImg: intfImg
-        }
+    components: {
+        IntfComponent
     }
 });

@@ -20,34 +20,25 @@
  *
  */
 
-import Vue from "vue";
+import OvsPort from './ovsport'
+import Intf from './intf'
 
-import * as intfImg from '../../assets/img/intf.png';
+export default class Container {
+    ID: string
+    name: string
+    ports = new Array<OvsPort>()
+    intfs = new Array<Intf>()
 
-import NodeComponent from './node'
-
-import IntfModel from '../models/intf'
-
-export default Vue.extend({
-    extends: NodeComponent,
-
-    template: `
-        <div :id="model.ID" v-bind:class="['node', model.type]">
-            <img :src="intfImg" width="32" height="32"/><br/>
-            {{model.name}}
-        </div>
-    `,
-
-    props: {
-        model: {
-            type: IntfModel,
-            required: true
-        }
-    },
-
-    data() {
-        return {
-            intfImg: intfImg
-        }
+    constructor(id: string, name: string) {
+        this.ID = id;
+        this.name = name;
     }
-});
+
+    addPort(port: OvsPort) {
+        this.ports.push(port);
+    }
+
+    addIntf(intf: Intf): void {
+        this.intfs.push(intf);
+    }
+}

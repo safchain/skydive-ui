@@ -20,34 +20,36 @@
  *
  */
 
-import Vue from "vue";
+import Intf from './intf'
+import OvsBridge from './ovsbridge'
+import NetNS from './netns'
 
-import * as intfImg from '../../assets/img/intf.png';
+export default class Host {
+    ID: string
+    name: string
+    intfs = new Array<Intf>()
+    bridges = new Array<Node>()
+    ovsBridges = new Array<OvsBridge>()
+    netNSs = new Array<NetNS>()
 
-import NodeComponent from './node'
-
-import IntfModel from '../models/intf'
-
-export default Vue.extend({
-    extends: NodeComponent,
-
-    template: `
-        <div :id="model.ID" v-bind:class="['node', model.type]">
-            <img :src="intfImg" width="32" height="32"/><br/>
-            {{model.name}}
-        </div>
-    `,
-
-    props: {
-        model: {
-            type: IntfModel,
-            required: true
-        }
-    },
-
-    data() {
-        return {
-            intfImg: intfImg
-        }
+    constructor(id: string, name: string) {
+        this.ID = id;
+        this.name = name;
     }
-});
+
+    addIntf(intf: Intf): void {
+        this.intfs.push(intf);
+    }
+
+    addBridge(bridge: Node): void {
+        this.bridges.push(bridge);
+    }
+
+    addOvsBridge(ovsbridge: OvsBridge): void {
+        this.ovsBridges.push(ovsbridge);
+    }
+
+    addNetNS(netns: NetNS): void {
+        this.netNSs.push(netns);
+    }
+}

@@ -15,7 +15,8 @@
         height: 1000px;
     }
 
-    .topology {
+    .hosts {
+        display: inline-flex;
     }
     
     .container {
@@ -36,6 +37,7 @@
 
     .container .content {
         text-align: center;
+        display: inline-grid;
     }
 
     .host {
@@ -44,16 +46,22 @@
     }
 
     .host .header {
-        /*background-color: #ffa100;*/
     }
 
-    .netns .header {
-        background-color: #006b29;
-        color: #eee;
+    .ovsbridge {
+        background-color:#d4d3d3;
+    }
+
+    .ovsbridge .header {
+        border-bottom: 1px solid #555;
     }
 
     .netns {
-        background-color:#d4d3d3;
+        background-color:#d0e4c7;
+    }
+
+    .netns .header {
+        border-bottom: 1px solid rgb(155, 182, 60);
     }
 
     .node {
@@ -75,7 +83,6 @@
 </head>
 
 <body>
-    Non mais what ?
     <div id="app"></div>
 </body>
 <script src="//d3js.org/d3.v4.min.js"></script>

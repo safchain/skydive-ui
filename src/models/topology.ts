@@ -20,13 +20,13 @@
  *
  */
 
-import Container from './container'
+import Host from './host'
 import Link from './link'
 
 export default class Topology {
     ID: string
     name: string
-    containers = new Array<Container>()
+    hosts = new Array<Host>()
     links = new Array<Link>()
 
     constructor(id: string, name: string) {
@@ -34,8 +34,8 @@ export default class Topology {
         this.name = name;
     }
 
-    addContainer(container: Container) {
-        this.containers.push(container);
+    addHost(host: Host) {
+        this.hosts.push(host);
     }
 
     addLink(link: Link) {

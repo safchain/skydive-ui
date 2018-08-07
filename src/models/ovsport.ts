@@ -20,34 +20,11 @@
  *
  */
 
-import Vue from "vue";
+import Node from "./node"
 
-import * as intfImg from '../../assets/img/intf.png';
+export default class OvsPort extends Node {
 
-import NodeComponent from './node'
-
-import IntfModel from '../models/intf'
-
-export default Vue.extend({
-    extends: NodeComponent,
-
-    template: `
-        <div :id="model.ID" v-bind:class="['node', model.type]">
-            <img :src="intfImg" width="32" height="32"/><br/>
-            {{model.name}}
-        </div>
-    `,
-
-    props: {
-        model: {
-            type: IntfModel,
-            required: true
-        }
-    },
-
-    data() {
-        return {
-            intfImg: intfImg
-        }
+    constructor(id: string, name: string) {
+        super(id, name, "ovsport")
     }
-});
+}

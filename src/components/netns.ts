@@ -22,32 +22,36 @@
 
 import Vue from "vue";
 
-import * as intfImg from '../../assets/img/intf.png';
+import ResizeObserver from 'resize-observer-polyfill';
 
-import NodeComponent from './node'
+import HolderComponent from "./holder";
+import IntfsHolderComponent from "./intfs-holder";
 
-import IntfModel from '../models/intf'
+import NetNsModel from "../models/netns" 
 
 export default Vue.extend({
-    extends: NodeComponent,
+    extends: HolderComponent,
 
     template: `
-        <div :id="model.ID" v-bind:class="['node', model.type]">
-            <img :src="intfImg" width="32" height="32"/><br/>
-            {{model.name}}
+        <div :id="model.ID" v-bind:class="['container', 'netns']" style="display: inline-block">
+            <div class="header" style="text-align: center">
+                <div class="title">{{model.name}}</div>
+            </div>
+            <div :id="model.ID + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
+                <intfs-holder-component :id="model.ID + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <intfs-holder-component :id="model.ID + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+            </div>
         </div>
     `,
 
     props: {
         model: {
-            type: IntfModel,
+            type: NetNsModel,
             required: true
         }
     },
 
-    data() {
-        return {
-            intfImg: intfImg
-        }
+    components: {
+        IntfsHolderComponent
     }
 });
