@@ -34,7 +34,7 @@ import NodeModel from "../models/node";
 export default Vue.extend({
     template: `
         <div class="topology">
-            <svg :id="'svg-' + model.ID" class="links">
+            <svg :id="'svg-' + model.ID" class="links" style="pointer-events:none">
                 <defs>
                     <marker id="markerSquare"
                         markerWidth="7"
@@ -52,7 +52,7 @@ export default Vue.extend({
             </svg>
             <div :id="model.ID" class="hosts">
                 <div v-for="host in model.hosts">
-                    <host-component :model="host" :onDomUpdate="onDomUpdate"/>
+                    <host-component :id="host.ID" :model="host" :onDomUpdate="onDomUpdate"/>
                 </div>
             </div>
         </div>
@@ -70,10 +70,6 @@ export default Vue.extend({
             svg: {},
             links: new Array<Link>()
         }
-    },
-
-    created: function() {
-        console.log(this.model.links);
     },
 
     mounted: function() {
@@ -180,8 +176,20 @@ class Link {
     }
 
     update(): void {
-        var el1 = document.getElementById(this.linkModel.node1.ID);
-        var el2 = document.getElementById(this.linkModel.node2.ID);
+        var el1: HTMLElement | null = null, el2: HTMLElement | null = null;
+
+        if (this.linkModel.node1.isVisible()) {
+            el1 = document.getElementById(this.linkModel.node1.ID);
+        } else if (this.linkModel.node1.parent) {
+            el1 = document.getElementById(this.linkModel.node1.parent.ID);
+        }
+
+        if (this.linkModel.node2.isVisible()) {
+            el2 = document.getElementById(this.linkModel.node2.ID);
+        } else if (this.linkModel.node2.parent) {
+            el2 = document.getElementById(this.linkModel.node2.parent.ID);
+        }
+
         if (!el1 || !el2) {
             return;
         }

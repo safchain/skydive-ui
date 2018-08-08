@@ -39,7 +39,7 @@ export default Vue.extend({
             required: true
         },
         onDomUpdate: {
-            type: Object,
+            type: Function,
             required: true
         }
     },

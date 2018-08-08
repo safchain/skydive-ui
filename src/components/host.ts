@@ -35,18 +35,18 @@ export default Vue.extend({
     extends: HolderComponent,
 
     template: `
-        <div :id="model.ID" v-bind:class="['container', model.type]" style="display: inline-block">
+        <div :id="id" v-bind:class="['container', model.type]" style="display: inline-block">
             <div class="header" style="text-align: center">
                 <div class="title">{{model.name}}</div>
             </div>
-            <div :id="model.ID + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
-                <intfs-holder-component :id="model.ID + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <intfs-holder-component :id="model.ID + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+            <div :id="id + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
+                <intfs-holder-component :id="id + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <intfs-holder-component :id="id + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
                 <div v-for="bridge in model.ovsBridges" style="display: inline-flex">
-                    <ovs-bridge-component :model="bridge" :onDomUpdate="onDomUpdate"/>
+                    <ovs-bridge-component :id="bridge.ID" :model="bridge" :onDomUpdate="onDomUpdate"/>
                 </div>
                 <div v-for="netns in model.netNSs">
-                    <net-ns-component :model="netns" :onDomUpdate="onDomUpdate"/>
+                    <net-ns-component :id="netns.ID" :model="netns" :onDomUpdate="onDomUpdate"/>
                 </div>
             </div>
         </div>

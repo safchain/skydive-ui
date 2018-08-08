@@ -21,23 +21,24 @@
  */
 
 import Node from './node'
+import Intf from './intf'
+import Bridge from './bridge'
 
-export default class NetNS {
-    ID: string
-    name: string
-    intfs = new Array<Node>()
-    bridges = new Array<Node>()
+export default class NetNS extends Node {
+    intfs = new Array<Intf>()
+    bridges = new Array<Bridge>()
 
     constructor(id: string, name: string) {
-        this.ID = id;
-        this.name = name;
+       super(id, name, "bridge")
     }
 
     addIntf(intf: Node): void {
         this.intfs.push(intf);
+        intf.parent = this;
     }
 
-    addBridge(bridge: Node): void {
+    addBridge(bridge: Bridge): void {
         this.bridges.push(bridge);
+        bridge.parent = this;
     }
 }

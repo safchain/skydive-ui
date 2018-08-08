@@ -20,25 +20,25 @@
  *
  */
 
+import Node from './node'
 import OvsPort from './ovsport'
 import Intf from './intf'
 
-export default class Container {
-    ID: string
-    name: string
+export default class OvsBridge extends Node {
     ports = new Array<OvsPort>()
     intfs = new Array<Intf>()
 
     constructor(id: string, name: string) {
-        this.ID = id;
-        this.name = name;
+       super(id, name, "ovsbridge");
     }
 
     addPort(port: OvsPort) {
         this.ports.push(port);
+        port.parent = this;
     }
 
     addIntf(intf: Intf): void {
         this.intfs.push(intf);
+        intf.parent = this;
     }
 }

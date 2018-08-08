@@ -34,13 +34,13 @@ export default Vue.extend({
     extends: HolderComponent,
 
     template: `
-        <div :id="model.ID" v-bind:class="['container', 'ovsbridge']" style="display: inline-block">
-            <div class="header" style="text-align: center">
+        <div :id="id" v-bind:class="['container', 'ovsbridge']" style="display: inline-block">
+            <div class="header" style="text-align: center" v-on:click="collapse()">
                 <div class="title">{{model.name}}</div>
             </div>
-            <div :id="model.ID + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
-                <intfs-holder-component :id="model.ID + '-ports'" :intfs="model.ports" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <intfs-holder-component :id="model.ID + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>    
+            <div :id="id + '-content'" v-if="!isCollapsed" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
+                <intfs-holder-component :id="id + '-ports'" :intfs="model.ports" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <intfs-holder-component :id="id + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
             </div>
         </div>
     `,

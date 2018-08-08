@@ -24,10 +24,12 @@ import Vue from "vue";
 
 import ResizeObserver from 'resize-observer-polyfill';
 
+import NodeModel from "../models/node";
+
 export default Vue.extend({
     template: `
-        <div :id="model.ID" class="container" style="display: inline-block">
-            <div :id="model.ID + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
+        <div :id="id" class="container" style="display: inline-block">
+            <div :id="id + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
             </div>
         </div>
     `,
@@ -40,11 +42,18 @@ export default Vue.extend({
             required: true
         },
         onDomUpdate: {
-            type: Object,
+            type: Function,
             required: true
         },
         direction: {
             type: String
+        },
+        collapsed: {
+            type: Boolean,
+            default: false
+        },
+        model: {
+            type: NodeModel
         }
     },
 
@@ -58,7 +67,17 @@ export default Vue.extend({
             }),
             resizeObserver: new ResizeObserver((entries, observer) => {
                 this.onDomUpdate();
-            })
+            }),
+            isCollapsed: this.model ? this.model.collapsed : this.collapsed
+        }
+    },
+
+    methods: {
+        collapse: function() {
+            this.isCollapsed = !this.isCollapsed
+            if (this.model) {
+                this.model.collapsed = this.isCollapsed;
+            }
         }
     },
 

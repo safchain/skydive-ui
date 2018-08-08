@@ -20,26 +20,7 @@
  *
  */
 
-import Node from './node'
+import Node from "./node"
 
-export default class Container {
-    ID: string
-    name: string
-    type: string
-    nodes = new Array<Node>()
-    containers = new Array<Container>()
-
-    constructor(id: string, name: string, type: string) {
-        this.ID = id;
-        this.name = name;
-        this.type = type;
-    }
-
-    addContainer(container: Container) {
-        this.containers.push(container);
-    }
-
-    addNode(node: Node) {
-        this.nodes.push(node);
-    }
+export default class Bridge extends Node {
 }

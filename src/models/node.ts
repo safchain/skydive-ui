@@ -24,10 +24,27 @@ export default class Node {
     ID: string
     name: string
     type: string
+    collapsed: boolean = false
+    parent: Node | null = null
 
     constructor(id: string, name: string, type: string) {
         this.ID = id;
         this.name = name;
         this.type = type;
+    }
+
+    isVisible() {
+        if (this.collapsed) {
+            return false;
+        }
+
+        var parent = this.parent;
+        while (parent) {
+            if (parent.collapsed) {
+                return false;
+            }
+            parent = parent.parent;
+        }
+        return true;
     }
 }

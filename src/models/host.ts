@@ -20,36 +20,39 @@
  *
  */
 
+import Node from './node'
 import Intf from './intf'
 import OvsBridge from './ovsbridge'
 import NetNS from './netns'
 
-export default class Host {
-    ID: string
-    name: string
+export default class Host extends Node {
+
     intfs = new Array<Intf>()
     bridges = new Array<Node>()
     ovsBridges = new Array<OvsBridge>()
     netNSs = new Array<NetNS>()
 
     constructor(id: string, name: string) {
-        this.ID = id;
-        this.name = name;
+        super(id, name, "host");
     }
 
     addIntf(intf: Intf): void {
         this.intfs.push(intf);
+        intf.parent = this;
     }
 
     addBridge(bridge: Node): void {
         this.bridges.push(bridge);
+        bridge.parent = this;
     }
 
     addOvsBridge(ovsbridge: OvsBridge): void {
         this.ovsBridges.push(ovsbridge);
+        ovsbridge.parent = this;
     }
 
     addNetNS(netns: NetNS): void {
         this.netNSs.push(netns);
+        netns.parent = this;
     }
 }

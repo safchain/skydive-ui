@@ -20,9 +20,9 @@
  *
  */
 
-import Node from "./node"
+import Intf from "./intf"
 
-export default class OvsPort extends Node {
+export default class OvsPort extends Intf {
 
     constructor(id: string, name: string) {
         super(id, name, "ovsport")
