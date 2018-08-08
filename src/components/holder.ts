@@ -66,6 +66,7 @@ export default Vue.extend({
                 this.onDomUpdate();
             }),
             resizeObserver: new ResizeObserver((entries, observer) => {
+                console.log("dsfdsfsdfsd")
                 this.onDomUpdate();
             }),
             isCollapsed: this.model ? this.model.collapsed : this.collapsed
@@ -90,6 +91,8 @@ export default Vue.extend({
                 childList: true 
             });
             this.resizeObserver.observe(target);
+        } else {
+            console.log(this.id);
         }
         
         var target = document.getElementById(this.id + '-content');

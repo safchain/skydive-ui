@@ -7,6 +7,7 @@ import Intf from "./models/intf";
 import OvsBridge from "./models/ovsbridge";
 import OvsPort from "./models/ovsport";
 import NetNS from "./models/netns";
+import Switch from "./models/switch";
 
 import Link from "./models/link";
 
@@ -14,7 +15,7 @@ let v = new Vue({
     el: "#app",
     template: `
     <div>
-        <topology-component name="big one" :model="model" />
+        <topology-component name="big one" :id="model.ID" :model="model" />
     </div>
     `,
     data: {
@@ -22,13 +23,22 @@ let v = new Vue({
     },
 
     created: function() {
-        for (let i = 0; i != 2; i++) {
-            var host1 = new Host("HOST1", "host " + i);
+        var sw = new Switch("SW1", "ToR 1");
+        this.model.addSwitch(sw);
+
+        for (let i = 0; i != 3; i++) {
+            var torPort = new Intf("TOR_PORT_" + i, "port " + i, "port")
+            sw.addPort(torPort);
+
+            var host1 = new Host("HOST_" + i, "host " + i);
             this.model.addHost(host1);
 
             var intf_eth0 = new Intf("INTF_ETH0_" + i, "eth0", "device")
             host1.addIntf(intf_eth0);
-            host1.addIntf(new Intf("INTF_ETH1_" + i, "eth1", "device"));
+            var intf_eth1 = new Intf("INTF_ETH1_" + i, "eth1", "device");
+            host1.addIntf(intf_eth1);
+
+            this.model.addLink(new Link("TOR_PORT_ETH1_" + i, torPort, intf_eth1, "layer2"));
 
             var ovs1 = new OvsBridge("OVS_" + i, "br-int");
             var port1 = new OvsPort("PORT1_0_" + i, "tap123456");
@@ -51,7 +61,7 @@ let v = new Vue({
             netns1.addIntf(ns1_lo);
             host1.addNetNS(netns1);
 
-            this.model.addLink(new Link("PORT_INTF", port1, ns1_eth0, "layer2"))
+            this.model.addLink(new Link("PORT1_INTF_" + i, port1, ns1_eth0, "layer2"))
 
             var netns2 = new NetNS("NS2" + i, "router");
             var ns2_eth0 = new Intf("NS2_ETH0_" + i, "eth0", "veth");
@@ -60,7 +70,7 @@ let v = new Vue({
             netns2.addIntf(ns2_lo);
             host1.addNetNS(netns2);
 
-            this.model.addLink(new Link("PORT_INTF", port2, ns2_eth0, "layer2"))
+            this.model.addLink(new Link("PORT2_INTF_" + i, port2, ns2_eth0, "layer2"))
         }
     },
 

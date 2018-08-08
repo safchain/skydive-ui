@@ -22,44 +22,37 @@
 
 import Vue from "vue";
 
+import ResizeObserver from 'resize-observer-polyfill';
+
+import IntfComponent from "./intf";
 import HolderComponent from "./holder";
 import IntfsHolderComponent from "./intfs-holder";
-import OvsBridgeComponent from "./ovsbridge";
-import NetNsComponent from "./netns";
 
-import HostModel from "../models/host"
+import SwitchModel from "../models/switch";
 
 export default Vue.extend({
     extends: HolderComponent,
 
     template: `
-        <div :id="id" v-bind:class="['container', model.type]">
+        <div :id="id" v-bind:class="['container', 'switch']" style="display: inline-block">
             <div class="header" style="text-align: center" v-on:click="collapse()">
                 <div class="title">{{model.name}}</div>
             </div>
-            <div :id="id + '-content'" class="content" v-if="!isCollapsed" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
-                <intfs-holder-component :id="id + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <intfs-holder-component :id="id + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <div v-for="bridge in model.ovsBridges" style="display: inline-flex">
-                    <ovs-bridge-component :id="bridge.ID" :model="bridge" :onDomUpdate="onDomUpdate"/>
-                </div>
-                <div v-for="netns in model.netNSs">
-                    <net-ns-component :id="netns.ID" :model="netns" :onDomUpdate="onDomUpdate"/>
-                </div>
+            <div :id="id + '-content'" v-if="!isCollapsed" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
+                <intfs-holder-component :id="id + '-ports'" :intfs="model.ports" :onDomUpdate="onDomUpdate" direction="horizontal"/>
             </div>
         </div>
     `,
 
     props: {
         model: {
-            type: HostModel,
+            type: SwitchModel,
             required: true
         }
     },
 
     components: {
-        OvsBridgeComponent,
-        NetNsComponent,
+        IntfComponent,
         IntfsHolderComponent
     }
 });

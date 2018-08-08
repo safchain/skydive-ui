@@ -21,28 +21,17 @@
  */
 
 import Node from './node'
-import Switch from './switch'
-import Host from './host'
-import Link from './link'
+import Intf from './intf'
 
-export default class Topology extends Node {
-    switches = new Array<Switch>()
-    hosts = new Array<Host>()
-    links = new Array<Link>()
-
+export default class Switch extends Node {
+    ports = new Array<Intf>()
+    
     constructor(id: string, name: string) {
-       super(id, name, "topology");
+       super(id, name, "switch");
     }
 
-    addSwitch(sw: Switch) {
-        this.switches.push(sw);
-    }
-
-    addHost(host: Host) {
-        this.hosts.push(host);
-    }
-
-    addLink(link: Link) {
-        this.links.push(link);
+    addPort(intf: Intf): void {
+        this.ports.push(intf);
+        intf.parent = this;
     }
 }

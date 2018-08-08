@@ -25,16 +25,16 @@ import Vue from "vue";
 import * as _ from "lodash";
 import * as d3 from "d3";
 
+import SwitchComponent from "./switch";
 import HostComponent from "./host";
 import LinkComponent, { LinkAnchor } from "./link";
 import TopologyModel from "../models/topology";
 import LinkModel from "../models/link";
-import NodeModel from "../models/node";
 
 export default Vue.extend({
     template: `
-        <div class="topology">
-            <svg :id="'svg-' + model.ID" class="links" style="pointer-events:none">
+        <div class="topology" :id="model.ID">
+            <svg :id="model.ID + '-svg'" class="links" style="pointer-events:none">
                 <defs>
                     <marker id="markerSquare"
                         markerWidth="7"
@@ -45,15 +45,17 @@ export default Vue.extend({
                             style="stroke: none; fill: #000000;"/>
                     </marker>
                 </defs>
-                <g v-for="link in links">
-                    <link-component :id="link.linkModel.ID" :x1="link.x1" :y1="link.y1" :anchor1="link.anchor1" 
-                        :x2="link.x2" :y2="link.y2" :anchor2="link.anchor2"/>
-                </g>
+                <link-component v-for="link in links" :key="link.linkModel.ID" :id="link.linkModel.ID" :x1="link.x1" :y1="link.y1" :anchor1="link.anchor1" 
+                    :x2="link.x2" :y2="link.y2" :anchor2="link.anchor2"
+                    v-if="link.visible"/>
             </svg>
-            <div :id="model.ID" class="hosts">
-                <div v-for="host in model.hosts">
-                    <host-component :id="host.ID" :model="host" :onDomUpdate="onDomUpdate"/>
+            <div :id="model.ID + '-switches'" class="switches">
+                <div v-for="sw in model.switches">
+                    <switch-component :id="sw.ID" :model="sw" :onDomUpdate="onDomUpdate"/>
                 </div>
+            </div>
+            <div :id="model.ID + '-hosts'" class="hosts">
+                <host-component  v-for="host in model.hosts" :key="host.ID" :id="host.ID" :model="host" :onDomUpdate="onDomUpdate"/>
             </div>
         </div>
     `,
@@ -67,13 +69,19 @@ export default Vue.extend({
 
     data() {
         return {
-            svg: {},
+            svg: d3.select('#' + this.model.ID + '-svg'),
             links: new Array<Link>()
         }
     },
 
     mounted: function() {
-        this.svg = d3.select('#svg-' + this.model.ID);
+        this.svg = d3.select('#' + this.model.ID + '-svg');
+       
+        this.resized();
+        window.addEventListener("resize", () => {
+            this.resized();
+            this.onDomUpdate();
+        });
 
         this.updateLinks();
     },
@@ -83,6 +91,21 @@ export default Vue.extend({
     },
 
     methods: {
+        resized: function() {
+            var div = document.getElementById(this.model.ID);
+            if (!div) {
+                return
+            }
+            var width = div.clientWidth;
+            var height = div.clientHeight;
+
+            if (this.svg) {
+                this.svg
+                    .attr("width", width)
+                    .attr("height", height);
+            }
+        },
+
         updateLinks: function() {
             var cmp = (l: Link, lm: LinkModel): boolean => {
                 return l.linkModel.ID === lm.ID;
@@ -116,7 +139,8 @@ export default Vue.extend({
 
     components: {
         LinkComponent,
-        HostComponent
+        HostComponent,
+        SwitchComponent
     }
 });
 
@@ -128,6 +152,7 @@ class Link {
     x2: Number = 0;
     y2: Number = 0;
     anchor2: LinkAnchor = LinkAnchor.Bottom;
+    visible: Boolean = true;
 
     constructor(link: LinkModel) {
         this.linkModel = link;
@@ -191,9 +216,10 @@ class Link {
         }
 
         if (!el1 || !el2) {
+            this.visible = false;
             return;
         }
-
+        
         var bb1 = el1.getBoundingClientRect();
         var bb2 = el2.getBoundingClientRect();
     
@@ -213,5 +239,6 @@ class Link {
         this.y2 = e2[1];
         this.anchor1 = a1;
         this.anchor2 = a2;
+        this.visible = true;
     }
 }
