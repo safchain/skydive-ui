@@ -52,10 +52,10 @@ export default Vue.extend({
                     v-if="link.visible"/>
             </svg>
             <div :id="model.ID + '-switches'" class="switches">
-                <switch-component v-for="sw in model.switches" :key="sw.ID" :id="sw.ID" :model="sw" :onDomUpdate="onDomUpdate"/>
+                <switch-component v-for="sw in model.switches" :key="sw.ID" :id="sw.ID" :model="sw" :onDomUpdate="onDomUpdate" :collapsed="true"/>
             </div>
             <div :id="model.ID + '-hosts'" class="hosts">
-                <host-component v-for="host in model.hosts" :key="host.ID" :id="host.ID" :model="host" :onDomUpdate="onDomUpdate"/>
+                <host-component v-for="host in model.hosts" :key="host.ID" :id="host.ID" :model="host" :onDomUpdate="onDomUpdate" :collapsed="true"/>
             </div>
         </div>
     `,

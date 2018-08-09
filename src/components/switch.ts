@@ -22,7 +22,7 @@
 
 import Vue from "vue";
 
-import ResizeObserver from 'resize-observer-polyfill';
+import * as SwitchImg from '../../assets/img/switch.png';
 
 import IntfComponent from "./intf";
 import HolderComponent from "./holder";
@@ -36,7 +36,10 @@ export default Vue.extend({
     template: `
         <div :id="id" v-bind:class="['container', 'switch']" style="display: inline-block">
             <div class="header" style="text-align: center" v-on:click="collapse()">
-                <div class="title">{{model.name}}</div>
+                <div class="title">
+                    <img :src="switchImg" width="18" height="18"/>
+                    {{model.name}}
+                </div>
             </div>
             <div :id="id + '-content'" v-if="!isCollapsed" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
                 <intfs-holder-component :id="id + '-ports'" :intfs="model.ports" :onDomUpdate="onDomUpdate" direction="horizontal"/>
@@ -48,6 +51,13 @@ export default Vue.extend({
         model: {
             type: SwitchModel,
             required: true
+        }
+    },
+
+
+    data() {
+        return {
+            switchImg: SwitchImg 
         }
     },
 

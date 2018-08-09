@@ -22,8 +22,6 @@
 
 import Vue from "vue";
 
-import ResizeObserver from 'resize-observer-polyfill';
-
 import HolderComponent from "./holder";
 import IntfsHolderComponent from "./intfs-holder";
 

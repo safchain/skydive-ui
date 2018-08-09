@@ -22,7 +22,7 @@
 
 import Vue from "vue";
 
-import * as intfImg from '../../assets/img/intf.png';
+import * as IntfImg from '../../assets/img/intf.png';
 
 import NodeComponent from './node'
 
@@ -47,7 +47,7 @@ export default Vue.extend({
 
     data() {
         return {
-            intfImg: intfImg
+            intfImg: IntfImg
         }
     }
 });
