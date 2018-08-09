@@ -22,6 +22,8 @@
 
 import Vue from "vue";
 
+import ResizeObserver from 'resize-observer-polyfill';
+
 import * as _ from "lodash";
 import * as d3 from "d3";
 
@@ -50,12 +52,10 @@ export default Vue.extend({
                     v-if="link.visible"/>
             </svg>
             <div :id="model.ID + '-switches'" class="switches">
-                <div v-for="sw in model.switches">
-                    <switch-component :id="sw.ID" :model="sw" :onDomUpdate="onDomUpdate"/>
-                </div>
+                <switch-component v-for="sw in model.switches" :key="sw.ID" :id="sw.ID" :model="sw" :onDomUpdate="onDomUpdate"/>
             </div>
             <div :id="model.ID + '-hosts'" class="hosts">
-                <host-component  v-for="host in model.hosts" :key="host.ID" :id="host.ID" :model="host" :onDomUpdate="onDomUpdate"/>
+                <host-component v-for="host in model.hosts" :key="host.ID" :id="host.ID" :model="host" :onDomUpdate="onDomUpdate"/>
             </div>
         </div>
     `,
@@ -78,10 +78,16 @@ export default Vue.extend({
         this.svg = d3.select('#' + this.model.ID + '-svg');
        
         this.resized();
-        window.addEventListener("resize", () => {
+
+        var resizeObserver = new ResizeObserver((entries, observer) => {
             this.resized();
             this.onDomUpdate();
-        });
+        })
+
+        var target = document.getElementById(this.model.ID);
+        if (target) {
+            resizeObserver.observe(target);
+        }
 
         this.updateLinks();
     },

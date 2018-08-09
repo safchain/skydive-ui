@@ -40,11 +40,12 @@ export default Vue.extend({
             <div :id="id + '-content'" class="content" v-if="!isCollapsed" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
                 <intfs-holder-component :id="id + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
                 <intfs-holder-component :id="id + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <div v-for="bridge in model.ovsBridges" style="display: inline-flex">
-                    <ovs-bridge-component :id="bridge.ID" :model="bridge" :onDomUpdate="onDomUpdate"/>
-                </div>
-                <div v-for="netns in model.netNSs">
-                    <net-ns-component :id="netns.ID" :model="netns" :onDomUpdate="onDomUpdate"/>
+                <ovs-bridge-component v-for="bridge in model.ovsBridges" :key="bridge.ID" :id="bridge.ID" :model="bridge" :onDomUpdate="onDomUpdate"/>
+                <div v-if="model.netNSs.length" class="netnss">
+                    <div class="header" style="text-align: center">
+                        <div class="title">Containers</div>
+                    </div>
+                    <net-ns-component v-for="netns in model.netNSs" :key="netns.ID" :id="netns.ID" :model="netns" :onDomUpdate="onDomUpdate" :collapsed="true"/>
                 </div>
             </div>
         </div>
