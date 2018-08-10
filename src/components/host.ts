@@ -46,7 +46,9 @@ export default Vue.extend({
             <div :id="id + '-content'" class="content" v-if="!isCollapsed" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
                 <intfs-holder-component :id="id + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
                 <intfs-holder-component :id="id + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <ovs-bridge-component v-for="bridge in model.ovsBridges" :key="bridge.ID" :id="bridge.ID" :model="bridge" :onDomUpdate="onDomUpdate" :collapsed="true"/>
+                <div v-if="model.ovsBridges.length" class="ovsbridges">
+                  <ovs-bridge-component v-for="bridge in model.ovsBridges" :key="bridge.ID" :id="bridge.ID" :model="bridge" :onDomUpdate="onDomUpdate" :collapsed="true"/>
+                </div>
                 <div v-if="model.netNSs.length" class="netnss">
                     <div class="header" style="text-align: center">
                         <div class="title">

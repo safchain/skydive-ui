@@ -20,15 +20,15 @@
  *
  */
 
-import Node from './node'
+import Entity from './entity'
 import Switch from './switch'
 import Host from './host'
 import Link from './link'
 
-export default class Topology extends Node {
-    switches = new Array<Switch>()
-    hosts = new Array<Host>()
-    links = new Array<Link>()
+export default class Topology extends Entity {
+    switches = new Array<Switch>();
+    hosts = new Array<Host>();
+    links = new Array<Link>();
 
     constructor(id: string, name: string) {
        super(id, name, "topology");

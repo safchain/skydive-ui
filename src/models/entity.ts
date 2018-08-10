@@ -20,12 +20,13 @@
  *
  */
 
-export default class Node {
-    ID: string
-    name: string
-    type: string
-    collapsed: boolean = false
-    parent: Node | null = null
+export default class Entity {
+    ID: string;
+    name: string;
+    type: string;
+    collapsed: boolean = false;
+    parent: Entity | null = null;
+    metadata: object = {};
 
     constructor(id: string, name: string, type: string) {
         this.ID = id;

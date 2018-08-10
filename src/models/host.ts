@@ -20,17 +20,17 @@
  *
  */
 
-import Node from './node'
+import Entity from './entity'
 import Intf from './intf'
 import OvsBridge from './ovsbridge'
 import NetNS from './netns'
+import Bridge from './bridge';
 
-export default class Host extends Node {
-
-    intfs = new Array<Intf>()
-    bridges = new Array<Node>()
-    ovsBridges = new Array<OvsBridge>()
-    netNSs = new Array<NetNS>()
+export default class Host extends Entity {
+    intfs = new Array<Intf>();
+    bridges = new Array<Bridge>();
+    ovsBridges = new Array<OvsBridge>();
+    netNSs = new Array<NetNS>();
 
     constructor(id: string, name: string) {
         super(id, name, "host");
@@ -41,7 +41,7 @@ export default class Host extends Node {
         intf.parent = this;
     }
 
-    addBridge(bridge: Node): void {
+    addBridge(bridge: Entity): void {
         this.bridges.push(bridge);
         bridge.parent = this;
     }

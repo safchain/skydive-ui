@@ -24,7 +24,7 @@ import Vue from "vue";
 
 import * as IntfImg from '../../assets/img/intf.png';
 
-import NodeComponent from './node'
+import NodeComponent from './entity'
 
 import IntfModel from '../models/intf'
 
@@ -34,7 +34,7 @@ export default Vue.extend({
     template: `
         <div :id="model.ID" v-bind:class="['node', model.type]">
             <img :src="intfImg" width="32" height="32"/><br/>
-            {{model.name}}
+            <span class="intf-name">{{model.name}}</span>
         </div>
     `,
 

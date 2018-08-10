@@ -20,13 +20,13 @@
  *
  */
 
-import Node from './node'
+import Entity from './entity'
 import OvsPort from './ovsport'
 import Intf from './intf'
 
-export default class OvsBridge extends Node {
-    ports = new Array<OvsPort>()
-    intfs = new Array<Intf>()
+export default class OvsBridge extends Entity {
+    ports = new Array<OvsPort>();
+    intfs = new Array<Intf>();
 
     constructor(id: string, name: string) {
        super(id, name, "ovsbridge");

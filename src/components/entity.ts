@@ -24,7 +24,7 @@ import Vue from "vue";
 
 import ResizeObserver from 'resize-observer-polyfill';
 
-import NodeModel from '../models/node'
+import EntityModel from '../models/entity'
 
 export default Vue.extend({
     template: `
@@ -35,7 +35,7 @@ export default Vue.extend({
 
     props: {
         model: {
-            type: NodeModel,
+            type: EntityModel,
             required: true
         },
         onDomUpdate: {

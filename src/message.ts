@@ -20,25 +20,30 @@
  *
  */
 
-import Entity from './entity'
-import Intf from './intf'
-import Bridge from './bridge'
+ import { Node, Edge } from './graph'
 
-export default class NetNS extends Entity {
-    intfs = new Array<Intf>();
-    bridges = new Array<Bridge>();
+export enum MessageType {
+    SyncRequest = "SyncRequest",
+    SyncReply = "SyncReply"
+}
 
-    constructor(id: string, name: string) {
-       super(id, name, "bridge")
+export default class Message {
+    UUID: string;
+    Namespace: string;
+    Type: string;
+    Status: number | undefined;
+    Obj: Object;
+    
+    constructor(UUID: string, namespace: string, type: string, obj: Object, status?: number) {
+        this.UUID = UUID;
+        this.Type = type;
+        this.Namespace = namespace;
+        this.Obj = obj;
+        this.Status = status;
     }
+}
 
-    addIntf(intf: Entity): void {
-        this.intfs.push(intf);
-        intf.parent = this;
-    }
-
-    addBridge(bridge: Bridge): void {
-        this.bridges.push(bridge);
-        bridge.parent = this;
-    }
+export class SyncReply {
+    Nodes: Array<Node> = new Array<Node>();
+    Edges: Array<Edge> = new Array<Edge>();
 }

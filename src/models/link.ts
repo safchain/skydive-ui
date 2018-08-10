@@ -23,10 +23,10 @@
 import Node from "./node"
 
 export default class Link {
-    ID: string
-    node1: Node
-    node2: Node
-    relationType: string
+    ID: string;
+    node1: Node;
+    node2: Node;
+    relationType: string;
 
     constructor(id: string, node1: Node, node2: Node, relationType: string) {
         this.ID = id;

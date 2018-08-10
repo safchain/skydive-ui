@@ -20,11 +20,14 @@
     "ts-loader": "^4.4.2",
     "typescript": "^2.9.2",
     "typings-for-css-modules-loader": "^1.7.0",
+    "uuid": "^3.3.2",
     "vue": "^2.5.16",
     "vue-loader": "^15.2.6",
     "vue-template-compiler": "^2.5.16",
     "webpack": "^4.16.2",
     "webpack-cli": "^3.1.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/uuid": "^3.4.3"
+  }
 }

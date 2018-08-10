@@ -20,11 +20,11 @@
  *
  */
 
-import Node from './node'
+import Entity from './entity'
 import Intf from './intf'
 
-export default class Switch extends Node {
-    ports = new Array<Intf>()
+export default class Switch extends Entity {
+    ports = new Array<Intf>();
     
     constructor(id: string, name: string) {
        super(id, name, "switch");

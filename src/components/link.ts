@@ -30,7 +30,6 @@ export enum LinkAnchor {
     Left,
     Bottom,
     Right
-
 }
 
 export default Vue.extend({

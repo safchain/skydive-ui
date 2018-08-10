@@ -20,7 +20,10 @@
  *
  */
 
-import Node from "./node"
+import Intf from "./intf"
 
-export default class Bridge extends Node {
+export default class Bridge extends Intf {
+    constructor(id: string, name: string) {
+        super(id, name, "bridge");
+    }
 }

@@ -20,7 +20,7 @@
  *
  */
 
-import Node from "./node"
+import Entity from "./entity"
 
-export default class Intf extends Node {
+export default class Intf extends Entity {
 }

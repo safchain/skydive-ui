@@ -24,7 +24,7 @@ import Vue from "vue";
 
 import ResizeObserver from 'resize-observer-polyfill';
 
-import NodeModel from "../models/node";
+import NodeModel from "../models/entity";
 
 export default Vue.extend({
     template: `
