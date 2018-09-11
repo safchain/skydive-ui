@@ -35,8 +35,8 @@ import LinkModel from "../models/link";
 
 export default Vue.extend({
     template: `
-        <div class="topology" :id="model.ID">
-            <svg :id="model.ID + '-svg'" class="links" style="pointer-events:none">
+        <div class="topology" :id="id">
+            <svg :id="id + '-svg'" class="links" style="pointer-events:none">
                 <defs>
                     <marker id="markerSquare"
                         markerWidth="7"
@@ -51,16 +51,20 @@ export default Vue.extend({
                     :x2="link.x2" :y2="link.y2" :anchor2="link.anchor2"
                     v-if="link.visible"/>
             </svg>
-            <div :id="model.ID + '-switches'" class="switches">
-                <switch-component v-for="sw in model.switches" :key="sw.ID" :id="sw.ID" :model="sw" :onDomUpdate="onDomUpdate" :collapsed="true"/>
+            <div :id="'switches-' + model.ID" class="switches">
+                <switch-component v-for="sw in model.switches" :key="sw.ID" :id="sw.ID" :model="sw" :onDomUpdate="onDomUpdate" :collapsed="false"/>
             </div>
-            <div :id="model.ID + '-hosts'" class="hosts">
-                <host-component v-for="host in model.hosts" :key="host.ID" :id="host.ID" :model="host" :onDomUpdate="onDomUpdate" :collapsed="true"/>
+            <div :id="'hosts-' + model.ID" class="hosts">
+                <host-component v-for="host in model.hosts" :key="host.ID" :id="host.ID" :model="host" :onDomUpdate="onDomUpdate" :collapsed="false"/>
             </div>
         </div>
     `,
 
     props: {
+        id: {
+            type: String,
+            required: true
+        },
         model: {
             type: TopologyModel,
             required: true
@@ -69,13 +73,13 @@ export default Vue.extend({
 
     data() {
         return {
-            svg: d3.select('#' + this.model.ID + '-svg'),
+            svg: d3.select('#' + this.id + '-svg'),
             links: new Array<Link>()
         }
     },
 
     mounted: function() {
-        this.svg = d3.select('#' + this.model.ID + '-svg');
+        this.svg = d3.select('#' + this.id + '-svg');
        
         this.resized();
 
@@ -84,7 +88,7 @@ export default Vue.extend({
             this.onDomUpdate();
         })
 
-        var target = document.getElementById(this.model.ID);
+        var target = document.getElementById(this.id);
         if (target) {
             resizeObserver.observe(target);
         }
@@ -98,8 +102,9 @@ export default Vue.extend({
 
     methods: {
         resized: function() {
-            var div = document.getElementById(this.model.ID);
+            var div = document.getElementById(this.id);
             if (!div) {
+                console.error("unable to find the topology div");
                 return
             }
             var width = div.clientWidth;
@@ -116,6 +121,8 @@ export default Vue.extend({
             var cmp = (l: Link, lm: LinkModel): boolean => {
                 return l.linkModel.ID === lm.ID;
             }
+
+            console.log(this.links);
 
             var toUpdate = _.intersectionWith(this.links, this.model.links, cmp);
             for (let link of toUpdate) {
@@ -191,7 +198,7 @@ class Link {
     endpoint(bb: ClientRect, x: number, y: number, anchor: LinkAnchor): [number, number] {
         // TODO make it custom
         var margin = 5;
-        
+
         if (anchor === LinkAnchor.Top) {
             return [x, y - bb.height / 2 - margin];
         }
@@ -209,23 +216,23 @@ class Link {
     update(): void {
         var el1: HTMLElement | null = null, el2: HTMLElement | null = null;
 
-        if (this.linkModel.node1.isVisible()) {
-            el1 = document.getElementById(this.linkModel.node1.ID);
-        } else if (this.linkModel.node1.parent) {
-            el1 = document.getElementById(this.linkModel.node1.parent.ID);
+        if (this.linkModel.entity1.isVisible()) {
+            el1 = document.getElementById(this.linkModel.entity1.ID);
+        } else if (this.linkModel.entity1.parent) {
+            el1 = document.getElementById(this.linkModel.entity1.parent.ID);
         }
 
-        if (this.linkModel.node2.isVisible()) {
-            el2 = document.getElementById(this.linkModel.node2.ID);
-        } else if (this.linkModel.node2.parent) {
-            el2 = document.getElementById(this.linkModel.node2.parent.ID);
+        if (this.linkModel.entity2.isVisible()) {
+            el2 = document.getElementById(this.linkModel.entity2.ID);
+        } else if (this.linkModel.entity2.parent) {
+            el2 = document.getElementById(this.linkModel.entity2.parent.ID);
         }
 
         if (!el1 || !el2) {
             this.visible = false;
             return;
         }
-        
+
         var bb1 = el1.getBoundingClientRect();
         var bb2 = el2.getBoundingClientRect();
     

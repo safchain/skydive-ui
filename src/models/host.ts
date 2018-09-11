@@ -27,7 +27,8 @@ import NetNS from './netns'
 import Bridge from './bridge';
 
 export default class Host extends Entity {
-    intfs = new Array<Intf>();
+    physIntfs = new Array<Intf>();
+    virtIntfs = new Array<Intf>();
     bridges = new Array<Bridge>();
     ovsBridges = new Array<OvsBridge>();
     netNSs = new Array<NetNS>();
@@ -37,7 +38,11 @@ export default class Host extends Entity {
     }
 
     addIntf(intf: Intf): void {
-        this.intfs.push(intf);
+        if (intf.type === "veth" || intf.type === "tun" || intf.type === "tap" || intf.type === "internal") {
+            this.virtIntfs.push(intf);
+        } else {
+            this.physIntfs.push(intf);
+        }
         intf.parent = this;
     }
 

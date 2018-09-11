@@ -34,7 +34,7 @@ export default Vue.extend({
         <div :id="id" class="intf-holder" style="display: inline-block">
             <div :id="id + '-content'" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
                 <div v-for="intf in intfs">
-                    <intf-component :model="intf" :onDomUpdate="onDomUpdate"/>
+                    <intf-component :id="intf.ID" :model="intf" :onDomUpdate="onDomUpdate"/>
                 </div>
             </div>
         </div>

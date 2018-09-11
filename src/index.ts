@@ -20,7 +20,7 @@ let v = new Vue({
     el: "#app",
     template: `
     <div>
-        <topology-component name="big one" :id="topology.ID" :model="graph.topology" />
+        <topology-component name="big one" :id="'topology-' + graph.topology.ID" :model="topology" />
     </div>
     `,
     data: {

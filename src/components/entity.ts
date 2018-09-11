@@ -28,12 +28,16 @@ import EntityModel from '../models/entity'
 
 export default Vue.extend({
     template: `
-        <div :id="node.ID" v-bind:class="['node', node.type]">
+        <div :id="id" v-bind:class="['node', node.type]">
             {{node.name}}
         </div>
     `,
 
     props: {
+        id: {
+            type: String,
+            required: true
+        },
         model: {
             type: EntityModel,
             required: true
@@ -56,7 +60,7 @@ export default Vue.extend({
     },
 
     mounted: function() {
-        var target = document.getElementById(this.model.ID);
+        var target = document.getElementById(this.id);
         if (target) {
             this.observer.observe(target, { 
                 characterData: true,

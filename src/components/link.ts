@@ -23,7 +23,6 @@
 import Vue from "vue";
 
 import * as d3 from "d3";
-import Link from "../models/link";
 
 export enum LinkAnchor {
     Top = 1,
@@ -103,17 +102,10 @@ export default Vue.extend({
         },
 
         controlPoint(x: number, y: number, dx: number, dy: number, anchor: LinkAnchor): [number, number] {
-            if (anchor === LinkAnchor.Top) {
-              return [x, y - dy];
-            }
-            if (anchor === LinkAnchor.Bottom) {
-              return [x, y + dy];
-            }
-            if (anchor === LinkAnchor.Left) {
-              return  [x - dx, y];
+            if (anchor === LinkAnchor.Top || anchor === LinkAnchor.Bottom) {
+                return [x, y + dy];
             }
             
-            // right
             return [x + dx, y];
         },
 
@@ -127,7 +119,7 @@ export default Vue.extend({
             var c1 = this.controlPoint(this.x1, this.y1, dx, dy, this.anchor1);
             points.push(c1);
         
-            var c2 = this.controlPoint(this.x2, this.y2, dx, dy, this.anchor2);
+            var c2 = this.controlPoint(this.x2, this.y2, -dx, -dy, this.anchor2);
             points.push(c2);
         
             points.push([this.x2, this.y2]);

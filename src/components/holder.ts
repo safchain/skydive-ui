@@ -24,7 +24,7 @@ import Vue from "vue";
 
 import ResizeObserver from 'resize-observer-polyfill';
 
-import NodeModel from "../models/entity";
+import EntityModel from "../models/entity";
 
 export default Vue.extend({
     template: `
@@ -53,7 +53,7 @@ export default Vue.extend({
             default: false
         },
         model: {
-            type: NodeModel
+            type: EntityModel
         }
     },
 

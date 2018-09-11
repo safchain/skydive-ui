@@ -20,18 +20,19 @@
  *
  */
 
-import Node from "./node"
+import Entity from "./entity"
 
 export default class Link {
     ID: string;
-    node1: Node;
-    node2: Node;
+    entity1: Entity;
+    entity2: Entity;
     relationType: string;
+    metadata: object = {};
 
-    constructor(id: string, node1: Node, node2: Node, relationType: string) {
+    constructor(id: string, entity1: Entity, entity2: Entity, relationType: string) {
         this.ID = id;
-        this.node1 = node1;
-        this.node2 = node2;
+        this.entity1 = entity1;
+        this.entity2 = entity2;
         this.relationType = relationType;
     }
 }

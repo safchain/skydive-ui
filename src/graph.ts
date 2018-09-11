@@ -32,6 +32,7 @@ import Bridge from "./models/bridge";
 import Intf from "./models/intf";
 import Entity from "./models/entity";
 import OvsPort from "./models/ovsport";
+import Link from "./models/link";
 
 export class Node {
     ID: string = "";
@@ -49,9 +50,8 @@ export class Edge {
     Metadata: {Type: string, RelationType: string} = {Type: "", RelationType: ""};
 }
 
-// shorter id
 function modelID(id: string): string {
-    return 'entity-' + id.split("-")[0];
+    return 'md-' + id;
 }
 
 export default class Graph {
@@ -61,7 +61,9 @@ export default class Graph {
     // cache to access directly to container objects
     private idToEntity = new Map<string, Entity>();
 
-    topology = new Topology(modelID(v4()), "Network topology");
+    topology = new Topology(v4(), "Network topology");
+
+    deja = false;
 
     subscribe(ws: WebSocketHandler) {
         ws.addMsgHandler("Graph", msg => {
@@ -77,42 +79,42 @@ export default class Graph {
         switch (node.Metadata.Type) {
             case "host":
                 var host = new Host(modelID(node.ID), node.Metadata.Name);
-                this.idToEntity.set(node.ID, host);
+                this.idToEntity.set(modelID(node.ID), host);
 
                 this.topology.addHost(host);
                 break;
             case "ovsbridge":
                 var ovsbridge = new OvsBridge(modelID(node.ID), node.Metadata.Name);
-                this.idToEntity.set(node.ID, ovsbridge);
+                this.idToEntity.set(modelID(node.ID), ovsbridge);
                 break;
             case "netns":
                 var netns = new NetNS(modelID(node.ID), node.Metadata.Name);
-                this.idToEntity.set(node.ID, netns);
+                this.idToEntity.set(modelID(node.ID), netns);
                 break;
             case "bridge":
                 var bridge = new Bridge(modelID(node.ID), node.Metadata.Name);
-                this.idToEntity.set(node.ID, bridge);
+                this.idToEntity.set(modelID(node.ID), bridge);
                 break;
             // ignore ofrule
             case "ofrule":
                 break;
             default:
                 var intf = new Intf(modelID(node.ID), node.Metadata.Name, node.Metadata.Type);
-                this.idToEntity.set(node.ID, intf);        
+                this.idToEntity.set(modelID(node.ID), intf);        
         }
     }
 
     private handleHostOwnership(edge: Edge) {
         var childNode = edge.childNode;
 
-        var entity = this.idToEntity.get(edge.parentNode.ID);
+        var entity = this.idToEntity.get(modelID(edge.parentNode.ID));
         if (!entity) {
             console.error("host node not found in the model " + edge.parentNode.ID);
             return;
         }
         var host = entity as Host;
 
-        entity = this.idToEntity.get(edge.childNode.ID);
+        entity = this.idToEntity.get(modelID(edge.childNode.ID));
         if (!entity) {
             console.error("child node not found in the model " + edge.childNode.ID);
             return;
@@ -136,14 +138,14 @@ export default class Graph {
     private handleNetNSOwnership(edge: Edge) {
         var childNode = edge.childNode;
 
-        var entity = this.idToEntity.get(edge.parentNode.ID);
+        var entity = this.idToEntity.get(modelID(edge.parentNode.ID));
         if (!entity) {
             console.error("netns node not found in the model " + edge.parentNode.ID);
             return;
         }
         var netns = entity as NetNS;
 
-        entity = this.idToEntity.get(edge.childNode.ID);
+        entity = this.idToEntity.get(modelID(edge.childNode.ID));
         if (!entity) {
             console.error("child node not found in the model " + edge.childNode.ID);
             return;
@@ -167,14 +169,14 @@ export default class Graph {
             return;
         }
 
-        var entity = this.idToEntity.get(edge.parentNode.ID);
+        var entity = this.idToEntity.get(modelID(edge.parentNode.ID));
         if (!entity) {
             console.error("ovsbridge node not found in the model " + edge.parentNode.ID);
             return;
         }
         var ovsbridge = entity as OvsBridge;
 
-        entity = this.idToEntity.get(edge.childNode.ID);
+        entity = this.idToEntity.get(modelID(edge.childNode.ID));
         if (!entity) {
             console.error("child node not found in the model " + edge.childNode.ID);
             return;
@@ -192,7 +194,7 @@ export default class Graph {
     // this method handles edges and does the appropriate thing to translate graph
     // to model.
     private addEdge(edge: Edge) {
-        this.edges.set(edge.ID, edge);
+        this.edges.set(modelID(edge.ID), edge);
 
         if (edge.Metadata.RelationType === "ownership") {
             switch (edge.parentNode.Metadata.Type) {
@@ -207,7 +209,27 @@ export default class Graph {
                     break;                      
             }
         } else {
-            
+            if (edge.childNode.Metadata.Type === "ovsport")
+                return;
+
+            var entity1 = this.idToEntity.get(modelID(edge.parentNode.ID));
+            if (!entity1) {
+                console.error("node 1 not found in the model " + edge.parentNode.ID);
+                return;
+            }
+
+            var entity2 = this.idToEntity.get(modelID(edge.childNode.ID));
+            if (!entity2) {
+                console.error("node 2 not found in the model " + edge.childNode.ID);
+                return;
+            }
+
+            /*if (!this.deja)
+                this.deja = true;
+            else
+                return;*/
+
+            this.topology.addLink(new Link(modelID(edge.ID), entity1, entity2, edge.Metadata.RelationType));
         }
     }
 
