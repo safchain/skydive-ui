@@ -20,18 +20,18 @@
  *
  */
 
-import Entity from './entity'
-import Intf from './intf'
+import Intf from "../models/intf";
 
-export default class Switch extends Entity {
-    ports = new Array<Intf>();
-    
-    constructor(id: string, name: string, metadata: any) {
-       super(id, name, "switch", metadata);
-    }
+export function sortIntfByName(intfs: Array<Intf>): Array<Intf> {
+    var intfs = intfs.slice()
+    intfs.sort((a: Intf, b: Intf) => {
+        if (a.metadata.State === "DOWN") return 1;
+        if (b.metadata.State === "DOWN") return -1;
 
-    addPort(intf: Intf): void {
-        this.ports.push(intf);
-        intf.parent = this;
-    }
+        if (a.name === "lo") return -1;
+        if (b.name === "lo") return 1;
+
+        return a.name.localeCompare(b.name) 
+    });
+    return intfs;
 }

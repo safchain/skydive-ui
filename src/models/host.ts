@@ -27,14 +27,15 @@ import NetNS from './netns'
 import Bridge from './bridge';
 
 export default class Host extends Entity {
+    unknown = new Array<Intf>();
     physIntfs = new Array<Intf>();
     virtIntfs = new Array<Intf>();
     bridges = new Array<Bridge>();
     ovsBridges = new Array<OvsBridge>();
     netNSs = new Array<NetNS>();
 
-    constructor(id: string, name: string) {
-        super(id, name, "host");
+    constructor(id: string, name: string, metadata: any) {
+        super(id, name, "host", metadata);
     }
 
     addIntf(intf: Intf): void {
@@ -59,5 +60,9 @@ export default class Host extends Entity {
     addNetNS(netns: NetNS): void {
         this.netNSs.push(netns);
         netns.parent = this;
+    }
+
+    addUnknown(un: Intf) {
+        this.unknown.push(un);
     }
 }

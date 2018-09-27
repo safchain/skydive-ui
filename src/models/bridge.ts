@@ -23,7 +23,7 @@
 import Intf from "./intf"
 
 export default class Bridge extends Intf {
-    constructor(id: string, name: string) {
-        super(id, name, "bridge");
+    constructor(id: string, name: string, metadata: any) {
+        super(id, name, "bridge", metadata);
     }
 }

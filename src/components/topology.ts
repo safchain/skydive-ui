@@ -32,6 +32,9 @@ import HostComponent from "./host";
 import LinkComponent, { LinkAnchor } from "./link";
 import TopologyModel from "../models/topology";
 import LinkModel from "../models/link";
+import IntfsHolderComponent from "./intfs-holder";
+import Entity from "../models/entity";
+import { link } from "fs";
 
 export default Vue.extend({
     template: `
@@ -47,15 +50,16 @@ export default Vue.extend({
                             style="stroke: none; fill: #000000;"/>
                     </marker>
                 </defs>
-                <link-component v-for="link in links" :key="link.linkModel.ID" :id="link.linkModel.ID" :x1="link.x1" :y1="link.y1" :anchor1="link.anchor1" 
-                    :x2="link.x2" :y2="link.y2" :anchor2="link.anchor2"
-                    v-if="link.visible"/>
+                <link-component v-for="link in links" :key="link.linkModel.ID" :id="link.linkModel.ID" v-bind="link" v-if="link.visible"/>
             </svg>
             <div :id="'switches-' + model.ID" class="switches">
                 <switch-component v-for="sw in model.switches" :key="sw.ID" :id="sw.ID" :model="sw" :onDomUpdate="onDomUpdate" :collapsed="false"/>
             </div>
             <div :id="'hosts-' + model.ID" class="hosts">
                 <host-component v-for="host in model.hosts" :key="host.ID" :id="host.ID" :model="host" :onDomUpdate="onDomUpdate" :collapsed="false"/>
+            </div>
+            <div :id="'unknown-' + model.ID" class="hosts">
+                <intfs-holder-component :id="id + '-unknown'" :intfs="model.unknown" :onDomUpdate="onDomUpdate" :collapsed="false"/>
             </div>
         </div>
     `,
@@ -107,8 +111,9 @@ export default Vue.extend({
                 console.error("unable to find the topology div");
                 return
             }
-            var width = div.clientWidth;
-            var height = div.clientHeight;
+
+            var width = div.offsetWidth;
+            var height = div.offsetHeight;
 
             if (this.svg) {
                 this.svg
@@ -121,8 +126,6 @@ export default Vue.extend({
             var cmp = (l: Link, lm: LinkModel): boolean => {
                 return l.linkModel.ID === lm.ID;
             }
-
-            console.log(this.links);
 
             var toUpdate = _.intersectionWith(this.links, this.model.links, cmp);
             for (let link of toUpdate) {
@@ -153,7 +156,8 @@ export default Vue.extend({
     components: {
         LinkComponent,
         HostComponent,
-        SwitchComponent
+        SwitchComponent,
+        IntfsHolderComponent
     }
 });
 
@@ -162,9 +166,11 @@ class Link {
     x1: Number = 0;
     y1: Number = 0;
     anchor1: LinkAnchor = LinkAnchor.Top;
+    entity1: Entity | null = null;
     x2: Number = 0;
     y2: Number = 0;
     anchor2: LinkAnchor = LinkAnchor.Bottom;
+    entity2: Entity | null = null;
     visible: Boolean = true;
 
     constructor(link: LinkModel) {
@@ -218,14 +224,18 @@ class Link {
 
         if (this.linkModel.entity1.isVisible()) {
             el1 = document.getElementById(this.linkModel.entity1.ID);
+            this.entity1 = this.linkModel.entity1;
         } else if (this.linkModel.entity1.parent) {
             el1 = document.getElementById(this.linkModel.entity1.parent.ID);
+            this.entity1 = null;
         }
 
         if (this.linkModel.entity2.isVisible()) {
             el2 = document.getElementById(this.linkModel.entity2.ID);
+            this.entity2 = this.linkModel.entity2;
         } else if (this.linkModel.entity2.parent) {
             el2 = document.getElementById(this.linkModel.entity2.parent.ID);
+            this.entity2 = null;
         }
 
         if (!el1 || !el2) {
@@ -245,11 +255,14 @@ class Link {
     
         var e1 = this.endpoint(bb1, bb1.left + bb1.width / 2, bb1.top + bb1.height / 2, a1);
         var e2 = this.endpoint(bb2, bb2.left + bb2.width / 2, bb2.top + bb2.height / 2, a2);
-    
-        this.x1 = e1[0];
-        this.y1 = e1[1];
-        this.x2 = e2[0];
-        this.y2 = e2[1];
+
+        var scrollLeft = window.pageXOffset || document.documentElement.scrollLeft,
+        scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+        this.x1 = e1[0] + scrollLeft;
+        this.y1 = e1[1] + scrollTop;
+        this.x2 = e2[0] + scrollLeft;
+        this.y2 = e2[1] + scrollTop;
         this.anchor1 = a1;
         this.anchor2 = a2;
         this.visible = true;

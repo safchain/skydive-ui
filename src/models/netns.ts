@@ -28,8 +28,8 @@ export default class NetNS extends Entity {
     intfs = new Array<Intf>();
     bridges = new Array<Bridge>();
 
-    constructor(id: string, name: string) {
-       super(id, name, "bridge")
+    constructor(id: string, name: string, metadata: any) {
+       super(id, name, "bridge", metadata)
     }
 
     addIntf(intf: Entity): void {

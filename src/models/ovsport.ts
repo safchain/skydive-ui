@@ -24,7 +24,7 @@ import Intf from "./intf"
 
 export default class OvsPort extends Intf {
 
-    constructor(id: string, name: string) {
-        super(id, name, "ovsport")
+    constructor(id: string, name: string, metadata: any) {
+        super(id, name, "ovsport", metadata)
     }
 }

@@ -24,14 +24,27 @@ import Entity from './entity'
 import Switch from './switch'
 import Host from './host'
 import Link from './link'
+import Intf from './intf'
+import entity from '../components/entity';
 
 export default class Topology extends Entity {
+    unknown = new Array<Intf>();
     switches = new Array<Switch>();
     hosts = new Array<Host>();
     links = new Array<Link>();
 
     constructor(id: string, name: string) {
-       super(id, name, "topology");
+       super(id, name, "topology", {});
+    }
+
+    addUnknown(un: Entity) {
+        //this.unknown.push(un);
+    }
+
+    delUnknown(un: Entity) {
+        this.unknown = this.unknown.filter(entity => {
+            return entity.ID !== un.ID;
+        });
     }
 
     addSwitch(sw: Switch) {
@@ -44,5 +57,9 @@ export default class Topology extends Entity {
 
     addLink(link: Link) {
         this.links.push(link);
+    }
+
+    delLink(link: Link) {
+        // TODO
     }
 }

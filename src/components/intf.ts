@@ -32,7 +32,7 @@ export default Vue.extend({
     extends: EntityComponent,
 
     template: `
-        <div :id="id" v-bind:class="['node', model.type]">
+        <div :id="id" :class="['node', model.type, model.metadata.State, highlighted]" v-on:mouseover="mouseOver" v-on:mouseout="mouseOut">
             <img :src="intfImg" width="32" height="32"/><br/>
             <span class="intf-name">{{model.name}}</span>
         </div>
@@ -45,9 +45,25 @@ export default Vue.extend({
         }
     },
 
+    computed: {
+        highlighted: function() {
+            return this.model.highlighted ? 'highlighted' : '';
+        }
+    },
+
     data() {
         return {
             intfImg: IntfImg
+        }
+    },
+
+    methods: {
+        mouseOver: function() {
+            this.model.highlighted = true;
+        },
+
+        mouseOut: function() {
+            this.model.highlighted = false;
         }
     }
 });

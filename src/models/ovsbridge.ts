@@ -28,8 +28,8 @@ export default class OvsBridge extends Entity {
     ports = new Array<OvsPort>();
     intfs = new Array<Intf>();
 
-    constructor(id: string, name: string) {
-       super(id, name, "ovsbridge");
+    constructor(id: string, name: string, metadata: any) {
+       super(id, name, "ovsbridge", metadata);
     }
 
     addPort(port: OvsPort) {

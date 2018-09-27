@@ -37,7 +37,7 @@ import Link from "./models/link";
 export class Node {
     ID: string = "";
     Host: string = "";
-    Metadata: {Type: string, Name: string} = {Type: "", Name: ""};
+    Metadata: any = {};
 }
 
 export class Edge {
@@ -47,7 +47,7 @@ export class Edge {
     Child: string = "";
     parentNode: Node = new Node();
     childNode: Node = new Node();
-    Metadata: {Type: string, RelationType: string} = {Type: "", RelationType: ""};
+    Metadata: any = {};
 }
 
 function modelID(id: string): string {
@@ -78,29 +78,38 @@ export default class Graph {
 
         switch (node.Metadata.Type) {
             case "host":
-                var host = new Host(modelID(node.ID), node.Metadata.Name);
+                var host = new Host(modelID(node.ID), node.Metadata.Name, node.Metadata);
                 this.idToEntity.set(modelID(node.ID), host);
 
                 this.topology.addHost(host);
                 break;
             case "ovsbridge":
-                var ovsbridge = new OvsBridge(modelID(node.ID), node.Metadata.Name);
+                var ovsbridge = new OvsBridge(modelID(node.ID), node.Metadata.Name, node.Metadata);
                 this.idToEntity.set(modelID(node.ID), ovsbridge);
+
+                this.topology.addUnknown(ovsbridge);
                 break;
             case "netns":
-                var netns = new NetNS(modelID(node.ID), node.Metadata.Name);
+                var netns = new NetNS(modelID(node.ID), node.Metadata.Name, node.Metadata);
                 this.idToEntity.set(modelID(node.ID), netns);
+
+                this.topology.addUnknown(netns);
                 break;
             case "bridge":
-                var bridge = new Bridge(modelID(node.ID), node.Metadata.Name);
+                var bridge = new Bridge(modelID(node.ID), node.Metadata.Name, node.Metadata);
                 this.idToEntity.set(modelID(node.ID), bridge);
+
+                this.topology.addUnknown(bridge);
                 break;
             // ignore ofrule
             case "ofrule":
                 break;
             default:
-                var intf = new Intf(modelID(node.ID), node.Metadata.Name, node.Metadata.Type);
-                this.idToEntity.set(modelID(node.ID), intf);        
+                var intf = new Intf(modelID(node.ID), node.Metadata.Name, node.Metadata.Type, node.Metadata);
+                this.idToEntity.set(modelID(node.ID), intf);
+
+                this.topology.addUnknown(intf);
+
         }
     }
 
@@ -131,8 +140,9 @@ export default class Graph {
                 host.addBridge(entity as Bridge);
                 break;
             default:
-                host.addIntf(entity  as Intf);
+                host.addIntf(entity as Intf);
         }
+        this.topology.delUnknown(entity);
     }
 
     private handleNetNSOwnership(edge: Edge) {
@@ -158,6 +168,7 @@ export default class Graph {
             default:
                 netns.addIntf(entity as Intf);
         }
+        this.topology.delUnknown(entity);
     }
 
 
@@ -189,6 +200,7 @@ export default class Graph {
             default:
                 ovsbridge.addIntf(entity as Intf);
         }
+        this.topology.delUnknown(entity);
     }
 
     // this method handles edges and does the appropriate thing to translate graph
@@ -206,7 +218,7 @@ export default class Graph {
                     break;
                 case "ovsbridge":
                     this.handleOvsBridgeOwnership(edge);
-                    break;                      
+                    break;
             }
         } else {
             if (edge.childNode.Metadata.Type === "ovsport")
@@ -234,11 +246,11 @@ export default class Graph {
     }
 
     msgHandler(msg: Message) {
-        switch(msg.Type) {
+        switch (msg.Type) {
             case MessageType.SyncReply:
                 var g = msg.Obj as SyncReply;
-              
-                // first add all nodes
+
+                // first add all host
                 for (let node of g.Nodes) {
                     this.addNode(node);
                 }

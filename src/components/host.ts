@@ -25,6 +25,12 @@ import Vue from "vue";
 import * as HostImg from '../../assets/img/host.png';
 import * as NetNSImg from '../../assets/img/ns.png';
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faAngleDown);
+
 import HolderComponent from "./holder";
 import IntfsHolderComponent from "./intfs-holder";
 import OvsBridgeComponent from "./ovsbridge";
@@ -32,25 +38,32 @@ import NetNsComponent from "./netns";
 
 import HostModel from "../models/host"
 
+import * as Common from './common'
+
 export default Vue.extend({
     extends: HolderComponent,
 
     template: `
         <div :id="id" v-bind:class="['container', model.type]">
-            <div class="header" style="text-align: center" v-on:click="collapse()">
+            <div class="header" style="text-align: center">
+                <div class="actions">
+                    <div class="collapsable" :class="{'collapsed': isCollapsed}" v-on:click="collapse()">
+                        <font-awesome-icon icon="angle-down"/>
+                    </div>
+                </div>
                 <div class="title">
                     <img :src="hostImg" width="18" height="18"/>
                     {{model.name}}
                 </div>
             </div>
             <div :id="id + '-content'" class="content" v-if="!isCollapsed" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
-                <intfs-holder-component :id="id + '-phys-intfs'" :intfs="model.physIntfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <intfs-holder-component :id="id + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <intfs-holder-component :id="id + '-phys-intfs'" :intfs="physIntfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <intfs-holder-component v-if="model.bridges.length" :id="id + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
                 <div v-if="model.ovsBridges.length" class="ovsbridges">
                   <ovs-bridge-component v-for="bridge in model.ovsBridges" :key="bridge.ID" :id="bridge.ID" :model="bridge" :onDomUpdate="onDomUpdate" :collapsed="false"/>
                 </div>
-                <intfs-holder-component :id="id + '-virt-intfs'" :intfs="model.virtIntfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <div v-if="model.netNSs.length" class="netnss">
+                <intfs-holder-component :id="id + '-virt-intfs'" :intfs="virtIntfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <div v-if="model.netNSs.length" class="container netnss">
                     <div class="header" style="text-align: center">
                         <div class="title">
                             <img :src="netNSImg" width="18" height="18"/>
@@ -77,7 +90,17 @@ export default Vue.extend({
         }
     },
 
+    computed: {
+        physIntfs: function () {
+            return Common.sortIntfByName( this.model.physIntfs.slice());
+        },
+        virtIntfs: function() {
+            return Common.sortIntfByName( this.model.virtIntfs.slice());
+        }
+    },
+
     components: {
+        FontAwesomeIcon,
         OvsBridgeComponent,
         NetNsComponent,
         IntfsHolderComponent

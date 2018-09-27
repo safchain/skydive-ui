@@ -22,22 +22,35 @@
 
 import Vue from "vue";
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faAngleDown } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+library.add(faAngleDown);
+
 import HolderComponent from "./holder";
 import IntfsHolderComponent from "./intfs-holder";
 
 import NetNsModel from "../models/netns" 
+
+import * as Common from './common'
 
 export default Vue.extend({
     extends: HolderComponent,
 
     template: `
         <div :id="id" v-bind:class="['container', 'netns']" style="display: inline-block">
-            <div class="header" style="text-align: center" v-on:click="collapse()">
+            <div class="header" style="text-align: center">
+                <div class="actions">
+                    <div class="collapsable" :class="{'collapsed': isCollapsed}" v-on:click="collapse()">
+                        <font-awesome-icon icon="angle-down"/>
+                    </div>
+                </div>
                 <div class="title">{{model.name}}</div>
             </div>
             <div :id="id + '-content'" v-if="!isCollapsed" class="content" v-bind:style="{display: (direction == 'horizontal' ? 'inline-flex': '')}">
-                <intfs-holder-component :id="id + '-intfs'" :intfs="model.intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
-                <intfs-holder-component :id="id + '-bridges'" :intfs="model.bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <intfs-holder-component :id="id + '-intfs'" :intfs="intfs" :onDomUpdate="onDomUpdate" direction="horizontal"/>
+                <intfs-holder-component :id="id + '-bridges'" :intfs="bridges" :onDomUpdate="onDomUpdate" direction="horizontal"/>
             </div>
         </div>
     `,
@@ -49,7 +62,17 @@ export default Vue.extend({
         }
     },
 
+    computed: {
+        intfs: function () {
+            return Common.sortIntfByName( this.model.intfs.slice());
+        },
+        bridges: function() {
+            return Common.sortIntfByName( this.model.bridges.slice());
+        }
+    },
+
     components: {
+        FontAwesomeIcon,
         IntfsHolderComponent
     }
 });

@@ -20,18 +20,22 @@
  *
  */
 
+import Link from "./link"
+
 export default class Entity {
     ID: string;
     name: string;
     type: string;
+    metadata: any = {};
     collapsed: boolean = false;
     parent: Entity | null = null;
-    metadata: object = {};
+    highlighted: boolean = false;
 
-    constructor(id: string, name: string, type: string) {
+    constructor(id: string, name: string, type: string, metadata: any) {
         this.ID = id;
         this.name = name;
         this.type = type;
+        this.metadata = metadata;
     }
 
     isVisible() {

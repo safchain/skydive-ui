@@ -23,6 +23,7 @@
 import Vue from "vue";
 
 import * as d3 from "d3";
+import Entity from "../models/entity";
 
 export enum LinkAnchor {
     Top = 1,
@@ -33,7 +34,7 @@ export enum LinkAnchor {
 
 export default Vue.extend({
     template: `
-        <g :id="id"></g>
+        <g :id="id" style="pointer-events:all"></g>
     `,
     props: {
         id: {
@@ -52,6 +53,9 @@ export default Vue.extend({
             type: Number,
             required: true
         },
+        entity1: {
+            type: Entity
+        },
         x2: {
             type: Number,
             required: true
@@ -64,19 +68,29 @@ export default Vue.extend({
             type: Number,
             required: true
         },
+        entity2: {
+            type: Entity
+        }
     },
 
     data() {
         return {
             lineGenerator: d3.line().curve(d3.curveBasis),
-            path: d3.select("#" + this.id)
+            link: d3.select("#" + this.id),
+            linkWrap: d3.select("#" + this.id)
         }
     },
 
     mounted: function() {
-        this.path = d3.select("#" + this.id).append("path")
+        this.link = d3.select("#" + this.id).append("path")
+            .attr("class", "link")
             .attr("style", "marker-start: url(#markerSquare); marker-end: url(#markerSquare);")
             .attr("d", "" + this.pathData());
+        this.linkWrap = d3.select("#" + this.id).append("path")
+            .attr("class", "link-wrap")
+            .attr("d", "" + this.pathData())
+            .on("mouseover", this.mouseOver)
+            .on("mouseout", this.mouseOut);
     },
 
     watch: {
@@ -91,14 +105,51 @@ export default Vue.extend({
         },
         y2: function(n: any, o: any): void {
             this.updatePath();
+        },
+        "entity1.highlighted": function(n: boolean, o: boolean): void {
+            this.linkWrap.classed("link-wrap-highlighted", n);
+            if (this.entity2) {
+                this.entity2.highlighted = n;
+            }
+        },
+        "entity2.highlighted": function(n: boolean, o: boolean): void {
+            this.linkWrap.classed("link-wrap-highlighted", n);
+            if (this.entity1) {
+                this.entity1.highlighted = n;
+            }
         }
     },
 
     methods: {
+        mouseOver: function() {
+            if (this.entity1) {
+                this.entity1.highlighted = true;
+            }
+
+            if (this.entity2) {
+                this.entity2.highlighted = true;
+            }
+        },
+
+        mouseOut: function() {
+            if (this.entity1) {
+                this.entity1.highlighted = false;
+            }
+
+            if (this.entity2) {
+                this.entity2.highlighted = false;
+            }
+        },
+
         updatePath: function() {
-            this.path
+            var data = this.pathData();
+
+            this.link
                 .transition()
-                .attr('d', "" + this.pathData());
+                .attr('d', "" + data);
+            this.linkWrap
+                .transition()
+                .attr('d', "" + data);
         },
 
         controlPoint(x: number, y: number, dx: number, dy: number, anchor: LinkAnchor): [number, number] {
